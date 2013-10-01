@@ -1,0 +1,26 @@
+{
+    "name": "nuevosmedios/redmine-api",
+    "type": "project",
+    "description": "Redmine API client",
+    "homepage": "https://github.com/kbsali/php-redmine-api",
+    "keywords": ["redmine", "api"],
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Juan Fernandez",
+            "email": "juanmf@gmail.com"
+        }
+    ],
+    "require": {
+        "php": ">=5.3.2",
+        "ext-curl": "*",
+        "kbsali/redmine-api":  "dev-master",
+        "symfony/yaml": "dev-master"
+
+    },
+    "autoload": {
+        "psr-0": {
+            "Redmine": "lib/"
+        }
+    }
+}
