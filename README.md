@@ -1,7 +1,7 @@
 RedmineIssueImporter
 ====================
 
-Used the following config file format to import sheets into redmine. So far it creates Issues, 
+Use the following config file format to import sheets into redmine. So far it creates Issues, 
 with custom fields, but it's extensible to add users, etc..
 
 ```yaml
