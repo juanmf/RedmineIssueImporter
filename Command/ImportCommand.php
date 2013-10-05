@@ -43,14 +43,14 @@ class ImportCommand extends Command
             ->addOption(
                'delimiter',
                null,
-               InputOption::VALUE_OPTIONAL,
-               'The sheet field delimiter, for CSV, defaults to ";"',
+               InputOption::VALUE_REQUIRED,
+               'The sheet field delimiter, for CSV.',
                null     
             )
             ->addOption(
                'fileType',
                null,
-               InputOption::VALUE_OPTIONAL,
+               InputOption::VALUE_REQUIRED,
                "The default file Format to be used, its case sensitive as the parser class name "
              . "beggins with this string and ends with 'SheetRecordParser' i.e. 'CsvSheetRecordParser'.",
                'Csv'     
@@ -68,6 +68,10 @@ class ImportCommand extends Command
         $delimiter = $input->getOption('delimiter') ? : null;
         $fileType = $input->getOption('fileType') ? : null;
 
+        if (null === $sheet || null === $record) {
+            throw new \Exception('Both, --sheet and --record options must be set.');
+        }
+        
         $import = \ImportService::getInstance(
             $fileName, $sheet, $delimiter, $fileType, $record
         );

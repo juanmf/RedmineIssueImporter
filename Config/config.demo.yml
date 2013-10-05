@@ -5,10 +5,7 @@ redmine_account:
   # http://www.redmine.org/projects/redmine/wiki/Rest_api#Authentication # show API Key.
   api_key: 'fc..8' # siup
   host: 'http://redmine.myserver.com.ar/'
-# values that determines the config that is to be used for next run  
-sheet_selection:
-  sheet: 'demandas' # sheets => demandas
-  record: 'demanda' # sheets => demandas => record => demanda
+
 input_format:
   file_type: 'Csv' # maps to CsvSheetRecordParser
   delimiter: '#'   # field delimiter

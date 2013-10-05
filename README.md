@@ -1,5 +1,47 @@
 RedmineIssueImporter
 ====================
+Use the Command Line and a config yml File to import CVS Sheets as Issues in Redmine.
+With Custom Fields support.
+
+The process:
+1) Identify the fields in the CVS sheet that match fields in Redmine Issues.
+2) Add connection info to the config file following the example. 
+3) Add Custom fields info into the config file, name and id, to allow importer to work properly.
+4) add mapping info, relating fields in sheet with Redmine fields.
+5) Fill Issue default values to use for the issues when the sheet field comes empty or when there is 
+no such field in sheet but redmine forces you to use it.
+6) Run the application from console.
+7) Optionally delete created Issues if mappings should be fixed.
+
+You have two commands:
+```
+import --sheet="..." --record="..." [--delimiter="..."] [--fileType="..."] dataFile
+delete [--all] --project="..."
+
+
+$ php importSheet.php help import
+Usage:
+ import [--sheet="..."] [--record="..."] [--delimiter="..."] [--fileType="..."] dataFile
+
+Arguments:
+ dataFile              absolute file path to the data sheet
+
+Options:
+ --sheet               The sheet name config to be used to interpret data in input sheet file.
+ --record              The default record name config to be used to interpret data in input sheet file.
+ --delimiter           The sheet field delimiter, for CSV.
+ --fileType            The default file Format to be used, its case sensitive as the parser class name beggins with this string and ends with 'SheetRecordParser' i.e. 'CsvSheetRecordParser'. (default: "Csv")
+
+
+$ php importSheet.php help delete
+Usage:
+ delete [--all] [--project="..."]
+
+Options:
+ --all                 if Specified, deletes all issues in a project. WARNING! all issues, not just the imported ones.
+ --project             This must be set either if --all is set or just last Run Ids need to be deleted. Its the project identifier, the one that appears in the URL. i.e.  <RedmineDomain>/projects/<projectIdentifier>/issues?...
+```
+
 
 Use the following config file format to import sheets into redmine. So far it creates Issues, 
 with custom fields, but it's extensible to add users, etc..
@@ -10,16 +52,15 @@ with custom fields, but it's extensible to add users, etc..
 ################################################################################
 redmine_account:
   # http://www.redmine.org/projects/redmine/wiki/Rest_api#Authentication # show API Key.
-  api_key: 'f6a...7e' 
-  host: 'http://redmine.iprodich:8181/redmine/'
-# values that determines the config that is to be used for next run  
-sheet_selection:
-  sheet: 'demandas' # sheets => demandas
-  record: 'demanda' # sheets => demandas => record => demanda
+  api_key: 'fc..8' # siup
+  host: 'http://redmine.myserver.com.ar/'
+
 input_format:
   file_type: 'Csv' # maps to CsvSheetRecordParser
-  delimiter: ';'   # field delimiter
+  delimiter: '#'   # field delimiter
   
+# false Makes everithing but call save on entities, for tests before hitting API
+save_records: true 
 ################################################################################
 # Sheets mapping configuration
 ################################################################################
@@ -27,19 +68,28 @@ on_error:
   behavior: continue # [continue, stop, rollback]
   display_exceptions: false # [true | false]
   
-save_records: true # false hace todo el proceso de validación sin hacer save. no saltan los errores de Doctrine, solo los del Form.
-
-custom_fields: # redmine custom fields settings <objectType> => <customFieldName> => id => <idValue>
+# redmine custom fields settings <objectType> => <customFieldName> => id => <idValue>
+custom_fields: 
   issue: 
     sprint: 
-      id: 1 # for issues, sprint field
+      id: 1 # for issues, Intermediario field
+    Localidad: 
+      id: 19 # for issues, Localidad field
+    "Fecha Comprometido": 
+      id: 21 # for issues, Fecha Comprometido field
+    Telefono: 
+      id: 20 # for issues, Telefono field
+    Beneficiario: 
+      id: 18 # for issues, Beneficiario field
+    Intermediario: 
+      id: 17 # for issues, Intermediario field
 
 # all sheets that can be importes should be mapped here
 sheets: 
   #1st sheet definition
   demandas:  
     # sheet Name, not used unless you add a web form that might use this name.
-    name: Planilla de Relevamiento Inicial del Legajo Unico de Alumnos -Chaco-
+    name: Planilla de Relevamiento de Demandas Area de Nuevos Medios
     # each sheet could host several record types, here's each definition
     records:
       # recordName use as index to select this config in [Run customization]
@@ -56,14 +106,18 @@ sheets:
             # these default need not to be in the sheet, but might be mandatory for the API.
             # you could also use defaults for cusotm fields here, just with the name.
             defaults:
-              project: Gestión I.Pro.Di.Ch
+              project: A Nuevos Medios, Seguimiento de Demandas
               status: Nueva
               priority: Normal
-              assigned_to: 'diego'
-              author: 'juanmf'
+              assigned_to_id: 92
+              author: 'juan'
               due_date: ~
-              start_date: ~
-              tracker: Tareas
+              start_date: [Defaults\Defaults, startDate]
+              tracker: Demanda
+              "Fecha Comprometido": '2013-11-01'
+              Beneficiario: N/N
+              subject: 'Sin Asunto'
+              Intermediario: '-----------------'
         
         # These are the fields expected to be present in the CSV or any other sheet like input
         # next definition matched a CSV as follows (showing two records): 
@@ -72,12 +126,12 @@ sheets:
         # subject2;Description2;8
         fields:
           # field name
-          subject:
+          beneficiario:
             # this key relates this field with Redmine's model described above
-            model: { entity: 'Issue', column: 'subject' }
+            model: {entity: 'Issue', column: 'Beneficiario'}
             # This are the coordinates, where the parser tries to find the 1st occurrence of the field. 
             # Zero based. from the upper-left corner
-            coord: {x: 0, y: 0}
+            coord: {x: 1, y: 0}
             # default value for this field. ovverides other defaults possibly defined above. 
             default: ~ # Si !== ~ pisa al default del schema y al default en [entities]
             # necesary moves to reach next instance of this field, e.i. next record. Normally it'll be just 
@@ -85,22 +139,202 @@ sheets:
             # (Y+0, X+0) so, the same value is used for every record.
             increment: {x: 0, y: 1}  
             # callback that might be needed to transform input data before being persisted.
-            transform: [Transformation, nombre] # a callback method
-
+            transform: ~ # a callback method
+            
+          subject:
+            model: {entity: 'Issue', column: 'subject'} # entity referencia entities[entity] no al schema. Para eso está entities[entity][schema_entity], en caso de que difiera.
+            coord: {x: 3, y: 0}
+            default: ~ # Si !== ~ pisa al default del schema y al default en [entities]
+            increment: {x: 0, y: 1}  # ~ = {x: 0, y: 0} if field is recurrent increment determines the relative loction of the next sibling. ~ means the field is no recurrent, only appears once in a sheet-
+            transform: [Transformers\Transformer, asunto] # a callback method
+          
+          intermediario:
+            model: {entity: 'Issue', column: 'Intermediario'} # entity referencia entities[entity] no al schema. Para eso está entities[entity][schema_entity], en caso de que difiera.
+            coord: {x: 2, y: 0}
+            default: ~ # Si !== ~ pisa al default del schema y al default en [entities]
+            increment: {x: 0, y: 1}  # ~ = {x: 0, y: 0} if field is recurrent increment determines the relative loction of the next sibling. ~ means the field is no recurrent, only appears once in a sheet-
+            transform: [Transformers\Transformer, intermediario] # a callback method
+           
           description:
-            model: { entity: 'Issue', column: 'description'} # entity referencia entities[entity] no al schema. Para eso está entities[entity][schema_entity], en caso de que difiera.
-            coord: {x: 1, y: 0}
+            model: {entity: 'Issue', column: 'description', glue: '| '} # entity referencia entities[entity] no al schema. Para eso está entities[entity][schema_entity], en caso de que difiera.
+            coord: {x: 3, y: 0}
             default: ~ # Si !== ~ pisa al default del schema y al default en [entities]
             increment: {x: 0, y: 1}  # ~ = {x: 0, y: 0} if field is recurrent increment determines the relative loction of the next sibling. ~ means the field is no recurrent, only appears once in a sheet-
             transform: ~ # a callback method
            
-          sprint:
-            model: { entity: 'Issue', column: 'sprint'} # entity referencia entities[entity] no al schema. Para eso está entities[entity][schema_entity], en caso de que difiera.
-            coord: {x: 2, y: 0}
-            default: 9 # Si !== ~ pisa al default del schema y al default en [entities]
+          localidad:
+            model: { entity: 'Issue', column: 'Localidad'} # entity referencia entities[entity] no al schema. Para eso está entities[entity][schema_entity], en caso de que difiera.
+            coord: {x: 0, y: 0}
+            default: ~ # Si !== ~ pisa al default del schema y al default en [entities]
+            increment: {x: 0, y: 1}  # ~ = {x: 0, y: 0} if field is recurrent increment determines the relative loction of the next sibling. ~ means the field is no recurrent, only appears once in a sheet-
+            transform: [Transformers\Transformer, localidad] # a callback method
+           
+          estado:
+            model: { entity: 'Issue', column: 'status'} # entity referencia entities[entity] no al schema. Para eso está entities[entity][schema_entity], en caso de que difiera.
+            coord: {x: 4, y: 0}
+            default: ~ # Si !== ~ pisa al default del schema y al default en [entities]
+            increment: {x: 0, y: 1}  # ~ = {x: 0, y: 0} if field is recurrent increment determines the relative loction of the next sibling. ~ means the field is no recurrent, only appears once in a sheet-
+            transform: [Transformers\Transformer, estado] # a callback method
+          
+          observaciones:
+            model: { entity: 'Issue', column: 'description', glue: '| '} # entity referencia entities[entity] no al schema. Para eso está entities[entity][schema_entity], en caso de que difiera.
+            coord: {x: 5, y: 0}
+            default: ~ # Si !== ~ pisa al default del schema y al default en [entities]
             increment: {x: 0, y: 1}  # ~ = {x: 0, y: 0} if field is recurrent increment determines the relative loction of the next sibling. ~ means the field is no recurrent, only appears once in a sheet-
             transform: ~ # a callback method
+          
+          fecha_inicio:
+            model: { entity: 'Issue', column: 'start_date'} # entity referencia entities[entity] no al schema. Para eso está entities[entity][schema_entity], en caso de que difiera.
+            coord: {x: 6, y: 0}
+            default: ~ # Si !== ~ pisa al default del schema y al default en [entities]
+            increment: {x: 0, y: 1}  # ~ = {x: 0, y: 0} if field is recurrent increment determines the relative loction of the next sibling. ~ means the field is no recurrent, only appears once in a sheet-
+            transform: [Transformers\Transformer, fecha] # a callback method
+           
+          localidad_en_descripcion:
+            model: { entity: 'Issue', column: 'description', glue: '| '} # entity referencia entities[entity] no al schema. Para eso está entities[entity][schema_entity], en caso de que difiera.
+            coord: {x: 0, y: 0}
+            default: ~ # Si !== ~ pisa al default del schema y al default en [entities]
+            increment: {x: 0, y: 1}  # ~ = {x: 0, y: 0} if field is recurrent increment determines the relative loction of the next sibling. ~ means the field is no recurrent, only appears once in a sheet-
+            transform: ~ # a callback method
+  #2st sheet definition
+  iprodich:  
+    # sheet Name, not used unless you add a web form that might use this name.
+    name: iprodich
+    # each sheet could host several record types, here's each definition
+    records:
+      # recordName use as index to select this config in [Run customization]
+      iprodich:
+        # record Label, not used.
+        name: iprodich
+        # Redmine Objects/Entities that are related to sheet's data.
+        entities:
+          # Issue object
+          Issue:
+            # previously relatd to Doctrien 1.X adapted to Redmine issue types.
+            # Not used schema_entity: ~ # si entities[entName] no coincide con el esquema setear este valor
+            # object deefault values (in this case Issue) can be [callbackClass, Callbackmethod]
+            # these default need not to be in the sheet, but might be mandatory for the API.
+            # you could also use defaults for cusotm fields here, just with the name.
+            defaults:
+              project: Gestión I.Pro.Di.Ch
+              status: Nueva
+              priority: Normal
+              assigned_to: juanmf
+              author: 'juan'
+              due_date: ~
+              start_date: [Defaults\Defaults, startDate]
+              tracker: Demanda
+              "Fecha Comprometido": '2013-11-01'
+              subject: 'Sin Asunto'
+              sprint: 8
+              
+        # These are the fields expected to be present in the CSV or any other sheet like input
+        # next definition matched a CSV as follows (showing two records): 
+        # [Subject] the rest of mandatory values are defined above for "Issue"
+        # subject1
+        fields:
+          # field name
+          subject:
+            model: {entity: 'Issue', column: 'subject'} # entity referencia entities[entity] no al schema. Para eso está entities[entity][schema_entity], en caso de que difiera.
+            coord: {x: 0, y: 0}
+            default: ~ # Si !== ~ pisa al default del schema y al default en [entities]
+            increment: {x: 0, y: 1}  # ~ = {x: 0, y: 0} if field is recurrent increment determines the relative loction of the next sibling. ~ means the field is no recurrent, only appears once in a sheet-
+            transform: [Transformers\Transformer, asunto] # a callback method
 
 ```
+You complete each part of this config file in each step of the definition process explained above as follows
+1) Identify the fields in the CVS sheet that match fields in Redmine Issues.
+  Let say we have the following csv record and its the 1st record of the file: 
+  ```
+  The kid is not my child;Father claims he's not the father;2013-10-05;Waiting for Revision;John Doe
+  ^ Subject               ^ description                     ^ stdate   ^ status             ^ relative
+  ^ coord: {x:0, y:0}     ^ coord: {x:1, y:0}               ^ {2, 0}   ^ {x:3, y:0}         ^ {x:4, y:0} # see coord is in fields: {<fieldName>: {coord: {x:, y:}}}
+  ```
 
-Depends on [kbsali/php-redmine-api](https://github.com/kbsali/php-redmine-api)
+2) Add connection info to the config file following the example. 
+  fill 
+```
+redmine_account:
+  api_key: 'fc..8' # siup
+  host: http://redmine...
+```
+3) Add Custom fields info into the config file, name and id, to allow importer to work properly.
+  In this case relative is a text custom field
+```
+custom_fields: 
+  issue: 
+    relative: 
+      id: 1
+```
+This is necessary so the importer can add the right id value in the REST request sent to Redmine API.
+
+4) add mapping info, relating fields in sheet with Redmine fields.
+fill, for each sheet field of interest (note you don't HAVE to use all fields in input sheet) 
+the following structure in config file:
+```
+  subject:
+    model: {entity: 'Issue', column: 'subject'} 
+    coord: {x: 3, y: 0}
+    default: ~ 
+    increment: {x: 0, y: 1} 
+    transform: [Transformers\Transformer, asunto] 
+```
+Where subject: is the sheet field name, name it as you wish.
+Where model refers to the Redmine entity and column/field name either native or custom
+where coord is the position, zero based, of the field in the record. as shown above
+where default is the value or function return value that replaces empty sheet cell values.
+where increment is the step that the parser must make to find the next field of same type. i.e. 
+the subject of the next record.
+where transform is the function that the entity populator calls to replace the non-empty 
+values that are found in the subject fields. This is useful for transforming despair human written 
+values to Redmine List fields or dates. @see Transformers\Transformer. to avoid transformers use ~
+
+5) Fill Issue default values to use for the issues when the sheet field comes empty or when there is 
+no such field in sheet but redmine forces you to use it.
+```
+sheets: 
+  demandas:  
+    records:
+      demanda:
+        name: Demanda
+        entities:
+          Issue:
+            defaults:
+              project: A Nuevos Medios, Seguimiento de Demandas
+              status: Nueva
+              priority: Normal
+              assigned_to: 'juan'
+              author: 'juan'
+              due_date: ~
+              start_date: [Defaults\Defaults, startDate]
+              tracker: Demanda
+              "Fecha Comprometido": '2013-11-01'  #custom field
+              Beneficiario: N/N  #custom field
+              subject: 'Sin Asunto' 
+              Intermediario: '-----------------' #custom field
+```
+
+6) Run the application from console.
+So far we already have a working config, try your 1st import:
+```
+import --sheet="..." --record="..." [--delimiter="..."] [--fileType="..."] dataFile
+```
+if it worked out just how you wanted, you are done.
+
+7) Optionally delete created Issues if mappings should be fixed.
+If there were errors, check your mappings, transformations, defaults, project name and identifier. 
+```
+delete [--all] --project="projectIdentifier"
+```
+WARNING 
+if --all is specified, this comand will fetch all issue ids in project and delete them
+if you don't specify --all, the application will try to find the  lastIssuesId.serialized
+that get written every time we finish an import process without a system crash, and holds the 
+ids under the project identifier. And it will deletes all ids present in it.
+
+
+Depends on @see composer.json
+[kbsali/php-redmine-api](https://github.com/kbsali/php-redmine-api)
+"symfony/yaml"
+"symfony/console"
+curl php extension

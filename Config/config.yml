@@ -3,16 +3,12 @@
 ################################################################################
 redmine_account:
   # http://www.redmine.org/projects/redmine/wiki/Rest_api#Authentication # show API Key.
-  api_key: 'fc9...8' # siup
-  host: 'http://redmine.intranet.site.ar/'
-#  api_key: 'f6af6..e' # iprodich
+  api_key: 'fc9b1..' # siup
+  host: 'http://redmine.intranet.server/'
+#  api_key: 'f..e' # iprodich
 #  host: 'http://redmine.iprodich:8181/redmine/'
 # values that determines the config that is to be used for next run  
-sheet_selection:
-  sheet: 'demandas' # sheets => demandas
-  record: 'demanda' # sheets => demandas => record => demanda
-#  sheet: 'iprodich' # sheets => demandas
-#  record: 'iprodich' # sheets => demandas => record => demanda
+
 input_format:
   file_type: 'Csv' # maps to CsvSheetRecordParser
   delimiter: '#'   # field delimiter

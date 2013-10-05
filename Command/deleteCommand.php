@@ -29,7 +29,7 @@ class deleteCommand extends Command
             ->addOption(
                'all',
                null,
-               InputOption::VALUE_OPTIONAL,
+               InputOption::VALUE_NONE,
                'if Specified, deletes all issues in a project. WARNING! all issues, not just the imported ones.'
             )
             ->addOption(
