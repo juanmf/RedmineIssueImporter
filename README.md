@@ -6,14 +6,20 @@ With Custom Fields support.
 
 The process:
 ------------
-1) Identify the fields in the CVS sheet that match fields in Redmine Issues.
-2) Add connection info to the config file following the example. 
-3) Add Custom fields info into the config file, name and id, to allow importer to work properly.
-4) add mapping info, relating fields in sheet with Redmine fields.
-5) Fill Issue default values to use for the issues when the sheet field comes empty or when there is 
+ 1) Identify the fields in the CVS sheet that match fields in Redmine Issues.
+ 
+ 2) Add connection info to the config file following the example. 
+ 
+ 3) Add Custom fields info into the config file, name and id, to allow importer to work properly.
+ 
+ 4) add mapping info, relating fields in sheet with Redmine fields.
+ 
+ 5) Fill Issue default values to use for the issues when the sheet field comes empty or when there is 
 no such field in sheet but redmine forces you to use it.
-6) Run the application from console.
-7) Optionally delete created Issues if mappings should be fixed.
+
+ 6) Run the application from console.
+ 
+ 7) Optionally delete created Issues if mappings should be fixed.
 
 You have two commands:
 ```
@@ -345,7 +351,9 @@ Dependencies
 
 Depends on @see composer.json
 [kbsali/php-redmine-api](https://github.com/kbsali/php-redmine-api)
+
 [symfony/yaml](https://github.com/symfony/Yaml)
+
 [symfony/console](https://github.com/symfony/Console)
 
 Instalation
