@@ -353,5 +353,28 @@ Instalation
 -----------
 
 1) git clone this repo on your directory of choise
+
 2) install [Composer](http://getcomposer.org/doc/00-intro.md#installation-windows)
+
 3) run compmoser install in this application directory so Composer fills the vendor directory with dependencies
+
+Usage
+-----
+```
+php importSheet.php help import
+php importSheet.php help delete
+
+php importSheet.php import --sheet="sheetNameInConfig" --record="recordNameInConfig" [--delimiter="..."] [--fileType="..."] dataFile
+php importSheet.php delete [--all] --project="projectIdentifier"
+```
+Example:
+```
+php importSheet.php import /home/juanmf/newIssuesCreatedInExcel.csv --sheet=demandas --record=demanda
+```
+ups, forgot to add default value for start_date, edit config File [Config/config.yml]:
+```
+php importSheet.php delete --project=projectId
+php importSheet.php import /home/juanmf/newIssuesCreatedInExcel.csv --sheet=demandas --record=demanda
+```
+Where projectId is the project identifier of the project for wich sheet "demandas" was configured.
+If you are importing issues to an empty project, for 1st time, then its safe to add --all option to delete command.
