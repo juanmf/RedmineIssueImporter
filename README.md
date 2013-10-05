@@ -345,9 +345,8 @@ Dependencies
 
 Depends on @see composer.json
 [kbsali/php-redmine-api](https://github.com/kbsali/php-redmine-api)
-"symfony/yaml"
-"symfony/console"
-curl php extension
+[symfony/yaml](https://github.com/symfony/Yaml)
+[symfony/console](https://github.com/symfony/Console)
 
 Instalation
 -----------
@@ -356,7 +355,7 @@ Instalation
 
 2) install [Composer](http://getcomposer.org/doc/00-intro.md#installation-windows)
 
-3) run compmoser install in this application directory so Composer fills the vendor directory with dependencies
+3) run [composer install](http://getcomposer.org/doc/00-intro.md#using-composer) in this application directory so Composer fills the vendor directory with dependencies
 
 Usage
 -----
