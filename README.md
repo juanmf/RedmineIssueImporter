@@ -5,7 +5,7 @@ With Custom Fields support.
 
 
 The process:
-============
+------------
 1) Identify the fields in the CVS sheet that match fields in Redmine Issues.
 2) Add connection info to the config file following the example. 
 3) Add Custom fields info into the config file, name and id, to allow importer to work properly.
@@ -45,7 +45,7 @@ Options:
 ```
 
 The Config File
-===============
+---------------
 
 Use the following config file format to import sheets into redmine. So far it creates Issues, 
 with custom fields, but it's extensible to add users, etc..
@@ -248,7 +248,7 @@ sheets:
 ```
 
 config Process & config File filling
-====================================
+------------------------------------
 
 You complete each part of this config file in each step of the definition process explained above as follows
 1) Identify the fields in the CVS sheet that match fields in Redmine Issues.
@@ -341,7 +341,7 @@ that get written every time we finish an import process without a system crash, 
 ids under the project identifier. And it will deletes all ids present in it.
 
 Dependencies
-============
+------------
 
 Depends on @see composer.json
 [kbsali/php-redmine-api](https://github.com/kbsali/php-redmine-api)
@@ -350,7 +350,7 @@ Depends on @see composer.json
 curl php extension
 
 Instalation
-===========
+-----------
 
 1) git clone this repo on your directory of choise
 2) install [Composer](http://getcomposer.org/doc/00-intro.md#installation-windows)
