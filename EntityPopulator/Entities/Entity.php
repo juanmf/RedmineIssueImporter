@@ -128,9 +128,11 @@ abstract class Entity implements \ArrayAccess
      */
     protected function checkErrors($apiReturn)
     {
-        if (isset($apiReturn->error)) {
+        if (isset($apiReturn->error) || ! ($apiReturn instanceof \SimpleXMLElement)) {
             $ex = new \EntityPopulator\RedmineApiException('The entity could not be persisted');
-            $ex->return = $apiReturn->error;
+            $ex->return = is_object($apiReturn) 
+                        ? $apiReturn->error 
+                        : 'No response from server, not even an error code, check config data, project name, etc.';
             throw $ex;
         }
     }

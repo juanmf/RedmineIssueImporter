@@ -3,16 +3,12 @@
 ################################################################################
 redmine_account:
   # http://www.redmine.org/projects/redmine/wiki/Rest_api#Authentication # show API Key.
-  api_key: 'fc9...8' # siup
-  host: 'http://redmine.intranet.site.ar/'
-#  api_key: 'f6af6..e' # iprodich
-#  host: 'http://redmine.iprodich:8181/redmine/'
+  api_key: 'fc..8' # siup
+  host: 'http://redmine.myserver.com.ar/'
 # values that determines the config that is to be used for next run  
 sheet_selection:
   sheet: 'demandas' # sheets => demandas
   record: 'demanda' # sheets => demandas => record => demanda
-#  sheet: 'iprodich' # sheets => demandas
-#  record: 'iprodich' # sheets => demandas => record => demanda
 input_format:
   file_type: 'Csv' # maps to CsvSheetRecordParser
   delimiter: '#'   # field delimiter
@@ -22,13 +18,15 @@ save_records: true
 ################################################################################
 # Sheets mapping configuration
 ################################################################################
-
 on_error:
   behavior: continue # [continue, stop, rollback]
   display_exceptions: false # [true | false]
-
-custom_fields: # redmine custom fields settings <objectType> => <customFieldName> => id => <idValue>
+  
+# redmine custom fields settings <objectType> => <customFieldName> => id => <idValue>
+custom_fields: 
   issue: 
+    sprint: 
+      id: 1 # for issues, Intermediario field
     Localidad: 
       id: 19 # for issues, Localidad field
     "Fecha Comprometido": 
@@ -39,8 +37,6 @@ custom_fields: # redmine custom fields settings <objectType> => <customFieldName
       id: 18 # for issues, Beneficiario field
     Intermediario: 
       id: 17 # for issues, Intermediario field
-    sprint: 
-      id: 1 # for issues, Intermediario field
 
 # all sheets that can be importes should be mapped here
 sheets: 
@@ -54,10 +50,6 @@ sheets:
       demanda:
         # record Label, not used.
         name: Demanda
-        # Must be the project identifier. <RedmineDomain>/projects/<projectIdentifier>/issues?...
-        # used to store the created Ids under the right identifier, and prevent accidents, assuming 
-        # you dont use same identifiers among different Redmine hosts...
-        project_id: demandas
         # Redmine Objects/Entities that are related to sheet's data.
         entities:
           # Issue object
@@ -71,7 +63,7 @@ sheets:
               project: A Nuevos Medios, Seguimiento de Demandas
               status: Nueva
               priority: Normal
-              assigned_to: ~ 
+              assigned_to_id: 92
               author: 'juan'
               due_date: ~
               start_date: [Defaults\Defaults, startDate]
@@ -158,7 +150,7 @@ sheets:
             default: ~ # Si !== ~ pisa al default del schema y al default en [entities]
             increment: {x: 0, y: 1}  # ~ = {x: 0, y: 0} if field is recurrent increment determines the relative loction of the next sibling. ~ means the field is no recurrent, only appears once in a sheet-
             transform: ~ # a callback method
-  #1st sheet definition
+  #2st sheet definition
   iprodich:  
     # sheet Name, not used unless you add a web form that might use this name.
     name: iprodich
@@ -168,7 +160,6 @@ sheets:
       iprodich:
         # record Label, not used.
         name: iprodich
-        project_id: iprodich
         # Redmine Objects/Entities that are related to sheet's data.
         entities:
           # Issue object
@@ -193,9 +184,8 @@ sheets:
               
         # These are the fields expected to be present in the CSV or any other sheet like input
         # next definition matched a CSV as follows (showing two records): 
-        # [Subject;Description;Sprint] the rest of mandatory values are defined above for "Issue"
-        # subject1;Description1;8
-        # subject2;Description2;8
+        # [Subject] the rest of mandatory values are defined above for "Issue"
+        # subject1
         fields:
           # field name
           subject:

@@ -19,6 +19,8 @@ class Issue extends Entity
     const API = 'issue';
     const CUSTOM_FIELDS_CONFIG_KEY = 'issue';
     
+    public static $createdIds = array();
+    
     /**
      * Holds the array of customFields ids. {@see Config/config.yml}
      * 
@@ -48,14 +50,29 @@ class Issue extends Entity
      */
     public function save()
     {
-        $api = \ImportService::getInstance()->getClient()->api(self::API);
+        $importService = \ImportService::getInstance();
+        $api = $importService->getClient()->api(self::API);
         /* @var $api \Redmine\Api\Issue */
         parent::adaptCustomFields($this);
         $return = $api->create($this->toArray());
         $this->checkErrors($return);
-        
+        $this->addIdToCreatedIds($return, $importService);
     }
 
+    /**
+     * stores last created Id in self::$createdIds. these id are used for issue deletion
+     * while testing our imports until we configure it right.
+     * 
+     * @param type $param
+     * 
+     * @return void
+     */
+    private function addIdToCreatedIds($return, $importService) 
+    {
+        $currentProject = $importService->getCurrentProject();
+        self::$createdIds[$currentProject]['issues'][] = array('id' => (string) $return->id);
+    }
+    
     /**
      * {@inheritdoc}
      */

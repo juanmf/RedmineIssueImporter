@@ -14,9 +14,9 @@
     "require": {
         "php": ">=5.3.2",
         "ext-curl": "*",
-        "kbsali/redmine-api":  "dev-master",
-        "symfony/yaml": "dev-master"
-
+        "kbsali/redmine-api": "dev-master",
+        "symfony/yaml": "dev-master",
+        "symfony/console": "dev-master"
     },
     "autoload": {
         "psr-0": {

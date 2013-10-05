@@ -118,7 +118,7 @@ class EntityPopulator
                     $eventName = 'redmine.api_error';
                     $parameters = array(
                         'record_parser'  => $recordParser, 
-                        'current_entity' => $recordParser->getCurrentEntity(), 
+                        'current_entity' => $entity, 
                         'entity'         => reset($entities),
                         'type'           => $e->return,
                         'err_code'       => $e->getCode(),

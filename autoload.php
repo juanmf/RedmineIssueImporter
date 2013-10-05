@@ -7,6 +7,9 @@ $paths = array(
     'Config' => array(__DIR__ ),
     'Parsers' => array(__DIR__ ),
     'EntityPopulator' => array(__DIR__),
+    'Transformers' => array(__DIR__),
+    'Command' => array(__DIR__),
+    '' => array(__DIR__),
 );
 
 foreach ($paths as $prefix => $path) {
