@@ -3,7 +3,9 @@ RedmineIssueImporter
 Use the Command Line and a config yml File to import CVS Sheets as Issues in Redmine.
 With Custom Fields support.
 
+
 The process:
+============
 1) Identify the fields in the CVS sheet that match fields in Redmine Issues.
 2) Add connection info to the config file following the example. 
 3) Add Custom fields info into the config file, name and id, to allow importer to work properly.
@@ -42,6 +44,8 @@ Options:
  --project             This must be set either if --all is set or just last Run Ids need to be deleted. Its the project identifier, the one that appears in the URL. i.e.  <RedmineDomain>/projects/<projectIdentifier>/issues?...
 ```
 
+The Config File
+===============
 
 Use the following config file format to import sheets into redmine. So far it creates Issues, 
 with custom fields, but it's extensible to add users, etc..
@@ -242,6 +246,10 @@ sheets:
             transform: [Transformers\Transformer, asunto] # a callback method
 
 ```
+
+config Process & config File filling
+====================================
+
 You complete each part of this config file in each step of the definition process explained above as follows
 1) Identify the fields in the CVS sheet that match fields in Redmine Issues.
   Let say we have the following csv record and its the 1st record of the file: 
@@ -332,9 +340,18 @@ if you don't specify --all, the application will try to find the  lastIssuesId.s
 that get written every time we finish an import process without a system crash, and holds the 
 ids under the project identifier. And it will deletes all ids present in it.
 
+Dependencies
+============
 
 Depends on @see composer.json
 [kbsali/php-redmine-api](https://github.com/kbsali/php-redmine-api)
 "symfony/yaml"
 "symfony/console"
 curl php extension
+
+Instalation
+===========
+
+1) git clone this repo on your directory of choise
+2) install [Composer](http://getcomposer.org/doc/00-intro.md#installation-windows)
+3) run compmoser install in this application directory so Composer fills the vendor directory with dependencies
