@@ -4,8 +4,8 @@ Use the Command Line and a config yml File to import CVS Sheets as Issues in Red
 With Custom Fields support.
 
 
-The process:
-------------
+The Import process:
+-------------------
  1) Identify the fields in the CVS sheet that match fields in Redmine Issues.
  
  2) Add connection info to the config file following the example. 
@@ -20,12 +20,29 @@ no such field in sheet but redmine forces you to use it.
  6) Run the application from console.
  
  7) Optionally delete created Issues if mappings should be fixed.
+ 
 
-You have two commands:
+The Update Process:
+-------------------
+1 & 2 & 3 & 4 from above Import Process
+
+5) As oposite to Import, only use default values for fields present in issues sheet. Otherwise you'll override current values in existing issues with their defaults.
+
+6) Run Application from Comman Line. e.g. $ php importSheet.php update /tmp/updateDemandas.csv --sheet=updatedemandas --record=demanda
+In this example I just used issues Id from /tmp/updateDemandas.csv and set a default value for a new Field (field added after Import). @see Config/Consig.yml
+
+You have three commands:
 ```
 import --sheet="..." --record="..." [--delimiter="..."] [--fileType="..."] dataFile
+update --sheet="..." --record="..." [--delimiter="..."] [--fileType="..."] dataFile
 delete [--all] --project="..."
 
+$ php importSheet.php list
+..
+Available commands:
+  delete   Deletes all issues (only if --all) in a project or issued created in last import command run. Does nothing if cant find serielized created issues ids file
+  import   Imports issues in a Redmine project, from a data sheet
+  update   update issues in a Redmine project, from a data sheet, given that Config/Config.yml denotes the "id" field in sheet
 
 $ php importSheet.php help import
 Usage:
@@ -40,6 +57,18 @@ Options:
  --delimiter           The sheet field delimiter, for CSV.
  --fileType            The default file Format to be used, its case sensitive as the parser class name beggins with this string and ends with 'SheetRecordParser' i.e. 'CsvSheetRecordParser'. (default: "Csv")
 
+$ php importSheet.php help update
+Usage:
+ update [--sheet="..."] [--record="..."] [--delimiter="..."] [--fileType="..."] dataFile
+
+Arguments:
+ dataFile              absolute file path to the data sheet
+
+Options:
+ --sheet               The sheet name config to be used to interpret data in input sheet file.
+ --record              The default record name config to be used to interpret data in input sheet file.
+ --delimiter           The sheet field delimiter, for CSV.
+ --fileType            The default file Format to be used, its case sensitive as the parser class name beggins with this string and ends with 'SheetRecordParser' i.e. 'CsvSheetRecordParser'. (default: "Csv")
 
 $ php importSheet.php help delete
 Usage:
@@ -250,7 +279,42 @@ sheets:
             default: ~ # Si !== ~ pisa al default del schema y al default en [entities]
             increment: {x: 0, y: 1}  # ~ = {x: 0, y: 0} if field is recurrent increment determines the relative loction of the next sibling. ~ means the field is no recurrent, only appears once in a sheet-
             transform: [Transformers\Transformer, asunto] # a callback method
-
+  #3rd sheet definition for updates
+  updatedemandas:  
+    # sheet Name, not used unless you add a web form that might use this name.
+    name: Las demandas que se exportaron por algo (enviar a evelyn) y se desea actualizar en batch
+    # each sheet could host several record types, here's each definition
+    records:
+      # recordName use as index to select this config in [Run customization]
+      demanda:
+        # record Label, not used.
+        name: Demanda
+        project_id: demandas
+        entities:
+          # Issue object
+          Issue:
+            defaults:
+              project: A Nuevos Medios, Seguimiento de Demandas
+              # just adding a boolean true for boolean Field "Derivado"
+              Derivado: 1
+        
+        # These are the fields expected to be present in the CSV or any other sheet like input
+        # next definition matched a CSV as follows (showing two records): 
+        # [id] the rest of mandatory values are defined above for "Issue"
+        # id1
+        # id2
+        fields:
+          # field name
+          id:
+            # this key relates this field with Redmine's model described above
+            model: {entity: 'Issue', column: 'id'}
+            # This are the coordinates, where the parser tries to find the 1st occurrence of the id ield. 
+            # Zero based. from the upper-left corner I use y:1 as the y:0 is used by Redmine field name headings
+            # because I used a CSV resulting from a Redmine Export for the update.
+            coord: {x: 0, y: 1}
+            default: ~
+            increment: {x: 0, y: 1}
+            transform: ~ # a callback method    
 ```
 
 config Process & config File filling
