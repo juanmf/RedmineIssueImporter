@@ -22,7 +22,7 @@ class ImportCommand extends Command
     {
         $this
             ->setName('import')
-            ->setDescription('Imports or delete issues in a Redmine project, from a data sheet')
+            ->setDescription('Imports issues in a Redmine project, from a data sheet')
             ->addArgument(
                 'dataFile',
                 InputArgument::REQUIRED,
