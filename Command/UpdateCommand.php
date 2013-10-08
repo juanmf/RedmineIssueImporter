@@ -22,7 +22,10 @@ class UpdateCommand extends Command
     {
         $this
             ->setName('update')
-            ->setDescription('update issues in a Redmine project, from a data sheet')
+            ->setDescription(
+                'update issues in a Redmine project, from a data sheet, '
+              . 'given that Config/Config.yml denotes the "id" field in sheet'
+            )
             ->addArgument(
                 'dataFile',
                 InputArgument::REQUIRED,

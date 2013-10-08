@@ -76,6 +76,5 @@ class ImportCommand extends Command
             $fileName, $sheet, $delimiter, $fileType, $record
         );
         $import->createTickets();
-        //$import->deleteIssuesInProject('demandas');
     }
 }
