@@ -76,6 +76,5 @@ class UpdateCommand extends Command
             $fileName, $sheet, $delimiter, $fileType, $record
         );
         $import->updateTickets();
-        //$import->deleteIssuesInProject('demandas');
     }
 }
