@@ -193,6 +193,22 @@ class ImportService
     }
     
     /**
+     * uses EntityPopulator to parse csv sheet and create redmine API entities (issue, user, etc)
+     * and persist them through the API.
+     * 
+     * @return void 
+     */
+    public function updateTickets()
+    {
+        $this->initImporter();
+        Transformers\Transformer::unSerializeMappings();
+        EntityPopulator::populateEntities($this->parser);
+        $this->serializeLastCreatedIds();
+        $this->checkForErrors();
+        Transformers\Transformer::serializeMappings();
+    }
+    
+    /**
      * Checks if the entityPopulator registered any errors, if so dumps them in
      * a file called __DIR__ . {@link self::ERROR_FILE_NAME}
      * 
@@ -357,5 +373,6 @@ class ImportService
         $this->currentProject = $sheets[$this->sheet]['records'][$this->record]['project_id'];
         ini_set('xdebug.var_display_max_data', '99999');
     }
+
     // </editor-fold>
 }

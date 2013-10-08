@@ -13,7 +13,7 @@ use Symfony\Component\Console\Output\OutputInterface;
  *
  * @author Juan Manuel Fernandez <juanmf@gmail.com>
  */
-class deleteCommand extends Command
+class DeleteCommand extends Command
 {
     /**
      * {@hinheritdoc}

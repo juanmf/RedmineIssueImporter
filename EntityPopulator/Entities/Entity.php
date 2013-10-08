@@ -17,7 +17,7 @@ abstract class Entity implements \ArrayAccess
     
     // <editor-fold defaultstate="collapsed" desc="ArrayAccess">
     public function offsetExists($offset) {
-        return isset($this->values);
+        return isset($this->values[$offset]);
     }
 
     public function offsetGet($offset) {
@@ -126,13 +126,18 @@ abstract class Entity implements \ArrayAccess
      * @return void
      * @throws \EntityPopulator\RedmineApiException If $error is present in API response
      */
-    protected function checkErrors($apiReturn)
+    protected function checkErrors($apiReturn, $noResponseIsOK = false)
     {
         if (isset($apiReturn->error) || ! ($apiReturn instanceof \SimpleXMLElement)) {
             $ex = new \EntityPopulator\RedmineApiException('The entity could not be persisted');
-            $ex->return = is_object($apiReturn) 
-                        ? $apiReturn->error 
-                        : 'No response from server, not even an error code, check config data, project name, etc.';
+            if (is_object($apiReturn)) {
+                $ex->return = $apiReturn->error ;
+            } else if (! $noResponseIsOK) {
+                $ex->return = 'No response from server, not even an error code, check config data, project name, etc.';
+            } else {
+                // in Update can return empty string.
+                return;
+            }
             throw $ex;
         }
     }

@@ -13,7 +13,7 @@ use Symfony\Component\Console\Output\OutputInterface;
  *
  * @author Juan Manuel Fernandez <juanmf@gmail.com>
  */
-class ImportCommand extends Command
+class UpdateCommand extends Command
 {
     /**
      * {@hinheritdoc}
@@ -21,8 +21,8 @@ class ImportCommand extends Command
     protected function configure()
     {
         $this
-            ->setName('import')
-            ->setDescription('Imports or delete issues in a Redmine project, from a data sheet')
+            ->setName('update')
+            ->setDescription('update issues in a Redmine project, from a data sheet')
             ->addArgument(
                 'dataFile',
                 InputArgument::REQUIRED,
@@ -75,7 +75,7 @@ class ImportCommand extends Command
         $import = \ImportService::getInstance(
             $fileName, $sheet, $delimiter, $fileType, $record
         );
-        $import->createTickets();
+        $import->updateTickets();
         //$import->deleteIssuesInProject('demandas');
     }
 }

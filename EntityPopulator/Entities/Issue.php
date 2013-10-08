@@ -50,10 +50,13 @@ class Issue extends Entity
      */
     public function save()
     {
+        parent::adaptCustomFields($this);
+        if (isset($this['id'])) {
+            return $this->update();
+        }
         $importService = \ImportService::getInstance();
         $api = $importService->getClient()->api(self::API);
         /* @var $api \Redmine\Api\Issue */
-        parent::adaptCustomFields($this);
         $return = $api->create($this->toArray());
         $this->checkErrors($return);
         $this->addIdToCreatedIds($return, $importService);
@@ -79,5 +82,15 @@ class Issue extends Entity
     public function getCustomFieldsConfig()
     {
         return self::$customFieldsConfig;
+    }
+
+    public function update()
+    {
+        $this['notes'] = 'Actualización Automatica, desde planilla.';
+        $importService = \ImportService::getInstance();
+        $api = $importService->getClient()->api(self::API);
+        /* @var $api \Redmine\Api\Issue */
+        $return = $api->update($this['id'], $this->toArray());
+        $this->checkErrors($return, true);
     }
 }

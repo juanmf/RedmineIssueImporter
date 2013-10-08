@@ -5,5 +5,6 @@ use Symfony\Component\Console\Application;
 
 $application = new Application();
 $application->add(new \Command\ImportCommand());
-$application->add(new \Command\deleteCommand());
+$application->add(new \Command\DeleteCommand());
+$application->add(new \Command\UpdateCommand());
 $application->run();
