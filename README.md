@@ -453,7 +453,7 @@ If you are importing issues to an empty project, for 1st time, then its safe to 
 Extending It
 ------------
 
-So far I just play with Issues [EntityPopulator/Entities/Issue.php](/juanmf/RedmineIssueImporter/blob/master/EntityPopulator/Entities/Issue.php). In [EntityPopulator/Entities](/juanmf/RedmineIssueImporter/blob/master/EntityPopulator/Entities) you can add any Redmine entity, as a class sharing its name and extending "Entity" implement the save method:
+So far I just play with Issues [EntityPopulator/Entities/Issue.php](/EntityPopulator/Entities/Issue.php). In [EntityPopulator/Entities](/EntityPopulator/Entities) you can add any Redmine entity, as a class sharing its name and extending "Entity" implement the save method:
 
 Here's the Issue::save(), its basically a proxy for the real [kbsali/php-redmine-api](https://github.com/kbsali/php-redmine-api) that adapt the field/values of custom fields before sending the create request, and takes care of updates if Id field already exists. 
 ```php
