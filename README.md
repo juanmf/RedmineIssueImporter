@@ -472,5 +472,5 @@ Here's the Issue::save(), its basically a proxy for the real [kbsali/php-redmine
     }
 ```
 
-You are welcome tom implement any entity (Users, Projects, etc.) from the Redmine [API](http://www.redmine.org/projects/redmine/wiki/Rest_api)
+You are welcome to implement any entity (Users, Projects, etc.) from the Redmine [API](http://www.redmine.org/projects/redmine/wiki/Rest_api)
 then all you need to do is adapt the [Config/Config.yml] to map its your CSV to the right Entities fields (one sheet could map to several Entities at ones).
