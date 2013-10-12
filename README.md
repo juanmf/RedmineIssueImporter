@@ -454,7 +454,7 @@ Extending It
 
 So far I just play with Issues [EntityPopulator/Entities/Issue.php](/EntityPopulator/Entities/Issue.php). In [EntityPopulator/Entities](/EntityPopulator/Entities) you can add any Redmine entity, as a class sharing its name and extending "Entity" implement the save method:
 
-Here's the Issue::save(), its basically a proxy for the real [kbsali/php-redmine-api](https://github.com/kbsali/php-redmine-api) that adapt the field/values of custom fields before sending the create request, and takes care of updates if Id field already exists. 
+Here's the Issue::save(), it's basically a proxy for the real [kbsali/php-redmine-api](https://github.com/kbsali/php-redmine-api) that adapt the field/values of custom fields before sending the create request, and takes care of updates if Id field already exists. 
 ```php
     public function save()
     {
@@ -472,4 +472,4 @@ Here's the Issue::save(), its basically a proxy for the real [kbsali/php-redmine
 ```
 
 You are welcome to implement any entity (Users, Projects, etc.) from the Redmine [API](http://www.redmine.org/projects/redmine/wiki/Rest_api)
-then all you need to do is adapt the [Config/Config.yml] to map its your CSV to the right Entities fields (one sheet could map to several Entities at ones).
+then all you need to do is adapt the [Config/Config.yml] to map your CSV to the right Entities fields (one sheet could map to several Entities at ones).
