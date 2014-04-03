@@ -31,9 +31,12 @@ class CsvSheetRecordParser extends SheetRecordParserAbstract
         $sheetFile, array $sheetRecordDefinition, $delimiter
     ) {
         parent::__construct($sheetFile, $sheetRecordDefinition, $delimiter);
-        $file = file($this->_sheetFile);
-        foreach ($file as $index => $line) {
-             $this->_sheet[$index] = explode($this->_delimiter, $line);
+        if (($handle = fopen($sheetFile, "r")) !== FALSE) {
+            $index = 0;
+            while (($data = fgetcsv($handle, 0, $delimiter)) !== FALSE) {
+                $this->_sheet[$index] = $data;
+                $index++;
+            }
         }
         $this->rewind();
     }
