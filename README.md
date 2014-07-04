@@ -84,6 +84,8 @@ The Config File
 Use the following config file format to import sheets into redmine. So far it creates Issues, 
 with custom fields, but it's extensible to add users, etc..
 
+You also have [this simpler example](https://gist.github.com/juanmf/8f75706af3ec7ed74918) Config file I made for a budy in need.
+
 ```yaml
 ################################################################################
 # Run customization
