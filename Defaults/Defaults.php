@@ -20,6 +20,7 @@ class Defaults
      */
     public static function startDate()
     {
+        date_default_timezone_set('UTC');
         return date('Y-m-d');
     }
 }
