@@ -134,6 +134,8 @@ abstract class Entity implements \ArrayAccess
                 $ex->return = $apiReturn->error ;
             } else if (! $noResponseIsOK) {
                 $ex->return = 'No response from server, not even an error code, check config data, project name, etc.';
+                $ex->return .= "\n" . print_r($apiReturn, true);
+                
             } else {
                 // in Update can return empty string.
                 return;
