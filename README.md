@@ -27,7 +27,12 @@ The Update Process:
 
 5) As oposite to Import, only use default values for fields present in issues sheet. Otherwise you'll override current values in existing issues with their defaults.
 
-6) Run Application from Comman Line. e.g. $ php importSheet.php update /tmp/updateDemandas.csv --sheet=updatedemandas --record=demanda
+6) Run Application from Comman Line. e.g. 
+
+```
+$ php importSheet.php update /tmp/updateDemandas.csv --sheet=updatedemandas --record=demanda
+```
+
 In this example I just used issues Id from /tmp/updateDemandas.csv and set a default value for a new Field (field added after Import). @see Config/Consig.yml
 
 You have three commands:
