@@ -1,6 +1,6 @@
 <?php
 
-namespace EntityPopulator\Helper;
+namespace Transform\EntityPopulator\Helper;
 
 /**
  * Description of PhpConfigsHelper

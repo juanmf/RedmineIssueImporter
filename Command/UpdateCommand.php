@@ -78,6 +78,6 @@ class UpdateCommand extends Command
         $import = \ImportService::getInstance(
             $fileName, $sheet, $delimiter, $fileType, $record
         );
-        $import->updateTickets();
+        $import->executeUpdate();
     }
 }

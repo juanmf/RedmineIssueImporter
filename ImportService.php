@@ -1,8 +1,10 @@
 <?php
 
-use \Parsers\SheetRecordParserAbstract,
-    \Config\Config, 
-    \EntityPopulator\EntityPopulator;
+use \In\Parsers\SheetRecordParserAbstract;
+use \Config\Config;
+use \Transform\EntityPopulator\EntityPopulator;
+use \In\Parsers\RecordDefinition\RecordDefinition;
+use Transform\EntityPopulator\Helper\EntityPersistenceHelper;
 
 /**
  * Manages the Client instantiation and runs the import process.
@@ -123,6 +125,9 @@ class ImportService
         $fileName = self::DEFAULT_DATA_FILE, $sheet = self::CONFIG_SHEET, 
         $delimiter = null, $fileType = self::FILETYPE, $record = self::RECORDTYPE
     ) {
+        /**
+         * TODO: MANDAR ESTO AL OUT.
+         */
         $redmineAccount = Config::get('redmine_account');
         $host = $redmineAccount['host'];
         $key = $redmineAccount['api_key'];
@@ -169,7 +174,9 @@ class ImportService
     private function configureImport($impData, $file)
     {
         $sheets = Config::get('sheets');
-        $record = $sheets[$impData['sheet']]['records'][$impData['record']];
+        $recordDef = $sheets[$impData['sheet']]['records'][$impData['record']];
+        $persistenceEngine = $sheets[$impData['sheet']]['persistence_engine'];
+        $record = RecordDefinition::getInstance($recordDef, $persistenceEngine);
         $recordParser = SheetRecordParserAbstract::getInstance(
             $file, $impData['file_type'], $record, $impData['delimiter']
         );
@@ -182,14 +189,14 @@ class ImportService
      * 
      * @return void 
      */
-    public function createTickets()
+    public function executeCreate()
     {
         $this->initImporter();
-        Transformers\Transformer::unSerializeMappings();
+        Transform\Transformers\Transformer::unSerializeMappings();
         EntityPopulator::populateEntities($this->parser);
         $this->serializeLastCreatedIds();
         $this->checkForErrors();
-        Transformers\Transformer::serializeMappings();
+        Transform\Transformers\Transformer::serializeMappings();
     }
     
     /**
@@ -198,14 +205,14 @@ class ImportService
      * 
      * @return void 
      */
-    public function updateTickets()
+    public function executeUpdate()
     {
         $this->initImporter();
-        Transformers\Transformer::unSerializeMappings();
+        Transform\Transformers\Transformer::unSerializeMappings();
         EntityPopulator::populateEntities($this->parser);
         $this->serializeLastCreatedIds();
         $this->checkForErrors();
-        Transformers\Transformer::serializeMappings();
+        Transform\Transformers\Transformer::serializeMappings();
     }
     
     /**
@@ -216,10 +223,11 @@ class ImportService
      */
     private function checkForErrors()
     {
+        // TODO: MAKE THIS WORK WITH ANY PERSISTENCE ENGINE
         $erroeFileName = __DIR__ . self::ERROR_FILE_NAME;
-        $conflicts = EntityPopulator::getConflicts();
-        if (0 < $count = count($conflicts['EntityPopulator\Entities\Issue'])) {
-            file_put_contents($erroeFileName, print_r((EntityPopulator::getConflicts()), true));
+        $conflicts = EntityPersistenceHelper::getConflicts();
+        if (0 < $count = count($conflicts['Transform\EntityPopulator\Entities\Issue'])) {
+            file_put_contents($erroeFileName, print_r(($conflicts), true));
             echo sprintf('check For errors in %s, %s found' . PHP_EOL, $erroeFileName, $count);
         }
     }
@@ -335,7 +343,7 @@ class ImportService
      */
     protected function serializeLastCreatedIds() 
     {
-        $ids = \EntityPopulator\Entities\Issue::$createdIds;
+        $ids = \Transform\EntityPopulator\Entities\Issue::$createdIds;
         $fName = __DIR__ . self::LAST_CREATED_ISSUES_IDS_FNAME;
         file_put_contents($fName, serialize($ids));
     }

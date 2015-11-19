@@ -16,7 +16,10 @@
         "ext-curl": "*",
         "kbsali/redmine-api": "dev-master",
         "symfony/yaml": "dev-master",
-        "symfony/console": "dev-master"
+        "symfony/console": "dev-master",
+        "symfony/event-dispatcher": "^2.7",
+        "symfony/config": "^2.7",
+        "symfony/dependency-injection": "^2.7"
     },
     "autoload": {
         "psr-0": {

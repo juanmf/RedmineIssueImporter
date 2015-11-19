@@ -1,6 +1,8 @@
 <?php
 
-namespace EntityPopulator\Entities;
+namespace Out\Entities\Redmine;
+
+use Out\Entities\Entity;
 
 /**
  * As EntityPopulatr thinks these are Doctrine1.X's DoctrineRecords, and redmine's api 
@@ -9,7 +11,7 @@ namespace EntityPopulator\Entities;
  *
  * @author Juan Manuel Fernandez <juanmf@gmail.com>
  */
-abstract class Entity implements \ArrayAccess
+abstract class RedmineEntity extends Entity 
 {
     const API = null;
 
@@ -49,15 +51,6 @@ abstract class Entity implements \ArrayAccess
     }
 
     /**
-     * uses the propper Redmine API object to create an instance of this entity 
-     * in redmine.
-     * 
-     * @return void
-     */
-    public abstract function save();
-    // </editor-fold>
-    
-    /**
      * retrieve from config the id of a dustom field.
      * 
      * @param strign $fieldName The custom fieldName e.g. 'sprint'
@@ -82,7 +75,7 @@ abstract class Entity implements \ArrayAccess
      * a custom field name, it is extracted from the values and added to a new value with key
      * 'custom_fields'
      * 
-     * @param \EntityPopulator\Entities\Entity $entity The Redmine entity being created 
+     * @param \Out\Entities\Entity $entity The Redmine entity being created 
      * treated.
      * 
      * @return void
@@ -103,7 +96,7 @@ abstract class Entity implements \ArrayAccess
     /**
      * Given that we found custom fields, create the custom_field structure.
      * 
-     * @param \EntityPopulator\Entities\Entity $entity 
+     * @param \Out\Entities\Entity $entity 
      * @param type $usedCustomFields
      * 
      * @return type
@@ -124,12 +117,12 @@ abstract class Entity implements \ArrayAccess
      * @param \SimpleXMLElement $apiReturn the API Response
      * 
      * @return void
-     * @throws \EntityPopulator\RedmineApiException If $error is present in API response
+     * @throws \Transform\EntityPopulator\RedmineApiException If $error is present in API response
      */
     protected function checkErrors($apiReturn, $noResponseIsOK = false)
     {
         if (isset($apiReturn->error) || ! ($apiReturn instanceof \SimpleXMLElement)) {
-            $ex = new \EntityPopulator\RedmineApiException('The entity could not be persisted');
+            $ex = new \Transform\EntityPopulator\RedmineApiException('The entity could not be persisted');
             if (is_object($apiReturn)) {
                 $ex->return = $apiReturn->error ;
             } else if (! $noResponseIsOK) {

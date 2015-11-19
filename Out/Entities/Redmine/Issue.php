@@ -1,6 +1,6 @@
 <?php
 
-namespace EntityPopulator\Entities;
+namespace Out\Entities\Redmine;
 
 use \Config\Config;
 
@@ -11,7 +11,7 @@ use \Config\Config;
  *
  * @author Juan Manuel Fernandez <juanmf@gmail.com>
  */
-class Issue extends Entity
+class Issue extends RedmineEntity
 {
     /**
      * The Redmin API this entity encapsulates {@see \Redmine\Client::api()}
@@ -56,6 +56,7 @@ class Issue extends Entity
         }
         $importService = \ImportService::getInstance();
         $api = $importService->getClient()->api(self::API);
+        die(var_dump($api));
         /* @var $api \Redmine\Api\Issue */
         $return = $api->create($this->toArray());
         $this->checkErrors($return);

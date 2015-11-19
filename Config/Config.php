@@ -3,6 +3,7 @@
 namespace Config;
 
 use Symfony\Component\Yaml\Yaml;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Config
@@ -13,7 +14,18 @@ class Config
 {
     const CONFIG_FILE = 'config.yml';
 
+    /**
+     * Parsed Config/config.yml
+     * 
+     * @var array 
+     */
     private static $config;
+    
+    /**
+     *
+     * @var ContainerInterface
+     */
+    private static $container;
     
     public static function get($param, $default = null)
     {   
@@ -27,4 +39,17 @@ class Config
         }
         return null;
     }
+
+    public static function getContainer() {
+        return self::$container;
+    }
+
+    public static function setContainer(ContainerInterface $container) {
+        self::$container = $container;
+    }
+
+    public static function getEntityFactory($presistenceEngine) {
+        return self::$container->get($presistenceEngine . "_factory");
+    }
+
 }

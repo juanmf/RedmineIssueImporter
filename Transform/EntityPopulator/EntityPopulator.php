@@ -1,15 +1,15 @@
 <?php
 
-namespace EntityPopulator;
+namespace Transform\EntityPopulator;
 
-use \Config\Config;
-use EntityPopulator\Helper\PhpConfigsHelper;    
-use EntityPopulator\Helper\ValidationHelper;    
-use EntityPopulator\Helper\EntityFactoryHelper;    
-use EntityPopulator\Helper\EntityRelationsHelper;    
-use EntityPopulator\Helper\EntityPersistenceHelper;    
-use EntityPopulator\Helper\RecordSanitizerHelper;    
-use \Parsers\SheetRecordParserAbstract;
+use Transform\EntityPopulator\Helper\PhpConfigsHelper;    
+use Transform\EntityPopulator\Helper\ValidationHelper;    
+use Transform\EntityPopulator\Helper\EntityFactoryHelper;    
+use Transform\EntityPopulator\Helper\EntityRelationsHelper;    
+use Transform\EntityPopulator\Helper\EntityPersistenceHelper;    
+use Transform\EntityPopulator\Helper\RecordSanitizerHelper;    
+use In\Parsers\SheetRecordParserAbstract;
+use In\Parsers\RecordDefinition\VisitorRecord;
 
 /**
  * Instantiates Entities acording to record definition present in config, populates 
@@ -85,20 +85,23 @@ class EntityPopulator
      * report.
      * 
      * @param SheetRecordParserAbstract $recordParser
-     * @throws \EntityPopulator\MethodNotImplementedException
+     * @throws \Transform\EntityPopulator\MethodNotImplementedException
      */
     private static function traverseSheet(SheetRecordParserAbstract $recordParser) {
         $recordDef = $recordParser->getSheetRecordDefinition();
         //self::$conn->transaction->setIsolation('READ UNCOMMITTED');
+        
+        
         foreach ($recordParser as $sheetRecord) {
+            /* @var $sheetRecord VisitorRecord */
             // We are not validating input. if we did, sfForms are missing.
 //                 $validatedVals = ValidationHelper::validateSheetRecord($sheetRecord);
             // if (null === $validatedVals) {
             //     continue;
             // }
-            $arrayChunksForEntities = self::sanitizeSheetRecord($sheetRecord, $recordDef);
+            self::sanitizeSheetRecord($sheetRecord);
             try {
-                $entities = EntityFactoryHelper::getRecordEntitiesInstances($arrayChunksForEntities, $recordDef);
+                $entities = EntityFactoryHelper::getRecordEntitiesInstances($sheetRecord);
 //                    EntityRelationsHelper::relateEntities($entities, $recordDef);
                 EntityPersistenceHelper::saveEntities($entities, $recordParser);
             } catch (MethodNotImplementedException $e) {
@@ -110,14 +113,22 @@ class EntityPopulator
         }
     }
 
-    private static function sanitizeSheetRecord($sheetRecord, $recordDef) {
-        $validatedVals = RecordSanitizerHelper::normalizeValues($sheetRecord);
-        $oneArrayPerEntityOnRecord = RecordSanitizerHelper::valueArrayChunkForEntitiesPerRecord(
-                $validatedVals, $recordDef
-            );
-        RecordSanitizerHelper::loadRecordDefinitionDefaultValuesPerEntityArrayChunk(
-                $oneArrayPerEntityOnRecord, $recordDef
-            );
-        return $oneArrayPerEntityOnRecord;
+    private static function sanitizeSheetRecord(VisitorRecord $sheetRecord) {
+//        $oneArrayPerEntityOnRecord = RecordSanitizerHelper::valueArrayChunkForEntitiesPerRecord(
+//                $sheetRecord, $recordDef
+//            );
+//        viejo, 
+        
+        RecordSanitizerHelper::lookUpForRecordFieldsDefault($sheetRecord);
+        RecordSanitizerHelper::applyRecordFieldsTransformation($sheetRecord);
+        /**
+         * TODO: los campos de los fields ya estan sanitizados, pero no mergidos 
+         * si hay composite Entity column con glue, 
+         * esa parte deberia venir despues. todo esta en VisitorRecord
+         */
+//        RecordSanitizerHelper::loadRecordDefinitionDefaultValuesPerEntityArrayChunk(
+//                $oneArrayPerEntityOnRecord, $recordDef
+//            );
+//        return $oneArrayPerEntityOnRecord;
     }
 }

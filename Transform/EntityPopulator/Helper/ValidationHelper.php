@@ -1,6 +1,8 @@
 <?php
 
-namespace EntityPopulator\Helper;
+namespace Transform\EntityPopulator\Helper;
+
+use Config\Config;
 
 /**
  * Description of ValidationHelper

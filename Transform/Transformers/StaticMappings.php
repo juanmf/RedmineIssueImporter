@@ -1,6 +1,7 @@
 <?php
 
-namespace Transformers;
+namespace Transform\Transformers;
+
 
 /**
  * Placeholder for mapping arrays and methods used from other transformes classes.

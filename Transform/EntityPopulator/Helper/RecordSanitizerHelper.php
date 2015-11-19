@@ -1,6 +1,9 @@
 <?php
 
-namespace EntityPopulator\Helper;
+namespace Transform\EntityPopulator\Helper;
+
+use In\Parsers\RecordDefinition\VisitorRecord;
+use In\Parsers\RecordDefinition\VisitorField;
 
 /**
  * Description of PhpConfigsHelper
@@ -10,22 +13,6 @@ namespace EntityPopulator\Helper;
 class RecordSanitizerHelper {
 
     /**
-     * Put values found in parsed record in a simpler {fieldName => fieldValue} new array 
-     * 
-     * @param array $sheetRecord The Current Record being parsed.
-     * 
-     * @return array {fieldName => fieldValue} 
-     */
-    public static function normalizeValues(array $sheetRecord)
-    {
-        $values = array();
-        foreach ($sheetRecord as $field) {
-            $values[$field['name']] = $field['value'];
-        }
-        return $values;
-    }
-
-    /**
      * This method is ment to distribute values among entities, in redmine we 
      * are just assigning all fields to one issue.
      * 
@@ -33,18 +20,19 @@ class RecordSanitizerHelper {
      * for each entity defined in this recordDefinition, not in the Doctrine
      * schema, assigning to each its own.
      * 
-     * @param array $values    The values retrieved by the parser for this record.
-     * @param array $recordDef The record Definition from config.
+     * @param VisitorRecord $sheetRecord    The values retrieved by the parser 
+     * for this record.
+     * @param array         $recordDef The record Definition from config.
      * 
      * @return array The splited array, wich keys are the related entities names.
      * {entName => {EntColunm1 => value, .., EntColunmN => value }}
      */
     public static function valueArrayChunkForEntitiesPerRecord(
-        array $values, array $recordDef
+        VisitorRecord $sheetRecord, array $recordDef
     ) {
         $split = array();
         foreach ($recordDef['entities'] as $entityName => $definition) {
-            foreach ($values as $fieldName => $value) {
+            foreach ($sheetRecord as $fieldName => $value) {
                 // $fieldName holds the field's name as in importSchema config
                 if ($entityName !== $fieldDef['model']['entity']) {
                     continue;
@@ -68,6 +56,26 @@ class RecordSanitizerHelper {
             }
         }
         return $split;
+    }
+    
+    public static function lookUpForRecordFieldsDefault(VisitorRecord $currentRecord) {
+        foreach ($currentRecord as $field) {
+            /* @var $field VisitorField */
+            if (empty($field->getCurrentValue())) {
+                $field->setCurrentValue(self::getDefault($field->getDefault()));
+            }
+        }
+    }
+    
+    public static function applyRecordFieldsTransformation(VisitorRecord $currentRecord) {
+        foreach ($currentRecord as $field) {
+            /* @var $field VisitorField */
+            if (! empty($field->getTransform())) {
+                $field->setCurrentValue(self::getTransformation(
+                    $field->getTransform(), $field->getCurrentValue()
+                ));
+            }
+        }
     }
     
     /**
@@ -180,10 +188,11 @@ class RecordSanitizerHelper {
      */
     protected static function getTransformation($transformSpecs, $origVal)
     {
+        $transformed = $origVal;
         if (is_callable($transformSpecs)) {
-            $origVal = call_user_func($transformSpecs, $origVal);
+            $transformed = call_user_func($transformSpecs, $origVal);
         }
-        return $origVal;
+        return $transformed;
     }
 
     /**
@@ -219,4 +228,5 @@ class RecordSanitizerHelper {
         }
         return $value;
     }
+
 }

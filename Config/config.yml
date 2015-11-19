@@ -3,8 +3,8 @@
 ################################################################################
 redmine_account:
   # http://www.redmine.org/projects/redmine/wiki/Rest_api#Authentication # show API Key.
-  api_key: 'fc958' # siup
-  host: 'http://redm.gov.ar/'
+  api_key: '6ba29fdc72bd5311896142a89c03db6774d24a7d' # siup
+  host: 'http://localhost:8080/'
 #  api_key: 'f7e' # iprodich
 #  host: 'http://redmine.:8181/redmine/'
 # values that determines the config that is to be used for next run  
@@ -40,31 +40,158 @@ custom_fields: # redmine custom fields settings <objectType> => <customFieldName
     Derivado: 
       id: 22 # for issues, Intermediario field
 
-# all sheets that can be importes should be mapped here
+##
+# All sheets that can be importes should be mapped here and respect the following
+# structure/format
+# in short:
+#sheets: 
+#  <sheet-1-Name>:  
+#    name: "description here"
+#    persistence_engine: [redmine|doctrine2]
+#    records: # a CSV sheet can have only one record type. May not be the case 
+#             # for a spreadSheet 
+#      <recordName>:
+#        name: "string for recod Name"
+#        project_id: demandas
+#        entities: # entity defaults
+#          <entity-1-Name>:
+#            schema_entity: ""
+#            defaults:
+#          <entity-n-Name>:
+#            defaults:
+#        fields: # sheet fields mapped to entities collumns
+#          <field-1-Name>: # See in detail for field structure.
+#          <field-n-Name>:
+#
+# in detail:
+#sheets: 
+#  #1st sheet definition
+#  <sheet-1-Name>:  
+#    # sheet Name, not used unless you add a web form that might use this name.
+#    name: Planilla de Relevamiento de Demandas Area de Nuevos Medios
+#    persistence_engine:  [redmine|doctrine2]
+#    # each sheet could host several record types, here's each definition
+#    records:
+#      # recordName use as index to select this config in [Run customization]
+#      <recordName>:
+#        # record Label, not used.
+#        name: Demanda
+#        # Must be the project identifier. <RedmineDomain>/projects/<projectIdentifier>/issues?...
+#        # used to store the created Ids under the right identifier, and prevent accidents, assuming 
+#        # you dont use same identifiers among different Redmine hosts...
+#        project_id: demandas
+#        # Redmine Objects/Entities that are related to sheet's data.
+#        entities:
+#          # Issue object
+#          <entity-1-Name>:
+#            # previously relatd to Doctrien 1.X adapted to Redmine issue types.
+#            # Not used schema_entity: ~ # si entities[entName] no coincide con el esquema setear este valor
+#            # object deefault values (in this case Issue) can be [callbackClass, Callbackmethod]
+#            # these default need not to be in the sheet, but might be mandatory for the API.
+#            # you could also use defaults for cusotm fields here, just with the name.
+#            defaults:
+#              <attr-1-Name>: Some Default 1
+#              <attr-2-Name>: Some Default 2
+#              <attr-N-Name>: Some default N
+#          # Issue object
+#          <entity-2-Name>:
+#            # previously relatd to Doctrien 1.X adapted to Redmine issue types.
+#            # Not used schema_entity: ~ # si entities[entName] no coincide con el esquema setear este valor
+#            # object deefault values (in this case Issue) can be [callbackClass, Callbackmethod]
+#            # these default need not to be in the sheet, but might be mandatory for the API.
+#            # you could also use defaults for cusotm fields here, just with the name.
+#            defaults:
+#              # same as for <entity-1-Name>:
+#        # These are the fields expected to be present in the CSV or any other sheet like input
+#        # next definition matched a CSV as follows (showing two records): 
+#        # [Subject;Description;Sprint] the rest of mandatory values are defined above for "Issue"
+#        # subject1;Description1;8
+#        # subject2;Description2;8
+#        fields:
+#          # field name
+#          <sheetField-1-Nmae>:
+#            # this key relates this field with Redmine's model described above,
+#            # <attr-N-Name> need not be defined, in <entity-1-Name>->defaults, but 
+#            # must exist in actual entity
+#            model: {entity: '<entity-1-Name>', column: '<attr-Name>'}
+#            # This are the coordinates, where the parser tries to find the 1st occurrence of the field. 
+#            # Zero based. from the upper-left corner
+#            coord: {x: 1, y: 0}
+#            # default value for this field. ovverides other defaults possibly defined above. 
+#            # TODO: IS IT NECESARY? 
+#            default: ~ # Si !== ~ pisa al default del schema y al default en [entities]
+#            # necesary moves to reach next instance of this field, e.i. next record. Normally it'll be just 
+#            # one step down. (Y+1, X+0). But for values in headers, that appears only once, might be 
+#            # (Y+0, X+0) so, the same value is used for every record.
+#            increment: {x: 0, y: 1}  
+#            # callback that might be needed to transform input data before being 
+#            # passed to the instantiated entity to be persisted.
+#            transform: ~ # a callback method
+#          <sheetField-2-Nmae>: # same structure as <entity-1-Name>
+#          <sheetField-n-Nmae>: # same structure as <entity-1-Name>
+##           
+            
 sheets: 
+  #test sheet definition
+  test:  
+    name: test Sheet with bitnami redmine stack
+    persistence_engine: redmine
+    records:
+      test:
+        name: Test Record
+        project_id: test
+        entities:
+          Issue:
+            defaults:
+              project: test
+              status: New
+              priority: Normal
+              assigned_to: ~ 
+              author: 'juanmf'
+              due_date: ~
+              start_date: [Transform\Defaults\Defaults, startDate]
+              tracker: Bug
+              subject: 'Sin Asunto'
+        
+        fields:
+          subject:
+            model: {entity: 'Issue', column: 'subject'} # entity referencia entities[entity] no al schema. Para eso está entities[entity][schema_entity], en caso de que difiera.
+            coord: {x: 0, y: 0}
+            default: ~ # Si !== ~ pisa al default del schema y al default en [entities]
+            increment: {x: 0, y: 1}  # ~ = {x: 0, y: 0} if field is recurrent increment determines the relative loction of the next sibling. ~ means the field is no recurrent, only appears once in a sheet-
+            transform: [Transformers\Transformer, asunto] # a callback method
+           
+          description:
+            model: {entity: 'Issue', column: 'description', glue: '| '} # entity referencia entities[entity] no al schema. Para eso está entities[entity][schema_entity], en caso de que difiera.
+            coord: {x: 1, y: 0}
+            default: ~ # Si !== ~ pisa al default del schema y al default en [entities]
+            increment: {x: 0, y: 1}  # ~ = {x: 0, y: 0} if field is recurrent increment determines the relative loction of the next sibling. ~ means the field is no recurrent, only appears once in a sheet-
+            transform: ~ # a callback method
+
+          estado:
+            model: { entity: 'Issue', column: 'status'} # entity referencia entities[entity] no al schema. Para eso está entities[entity][schema_entity], en caso de que difiera.
+            coord: {x: 2, y: 0}
+            default: ~ # Si !== ~ pisa al default del schema y al default en [entities]
+            increment: {x: 0, y: 1}  # ~ = {x: 0, y: 0} if field is recurrent increment determines the relative loction of the next sibling. ~ means the field is no recurrent, only appears once in a sheet-
+            transform: [Transformers\Transformer, estado] # a callback method
+          
+          observaciones:
+            model: { entity: 'Issue', column: 'description', glue: '| '} # entity referencia entities[entity] no al schema. Para eso está entities[entity][schema_entity], en caso de que difiera.
+            coord: {x: 3, y: 0}
+            default: ~ # Si !== ~ pisa al default del schema y al default en [entities]
+            increment: {x: 0, y: 1}  # ~ = {x: 0, y: 0} if field is recurrent increment determines the relative loction of the next sibling. ~ means the field is no recurrent, only appears once in a sheet-
+            transform: ~ # a callback method
+          
   #1st sheet definition
   demandas:  
-    # sheet Name, not used unless you add a web form that might use this name.
     name: Planilla de Relevamiento de Demandas Area de Nuevos Medios
-    # each sheet could host several record types, here's each definition
+    persistence_engine: redmine
     records:
-      # recordName use as index to select this config in [Run customization]
       demanda:
-        # record Label, not used.
         name: Demanda
-        # Must be the project identifier. <RedmineDomain>/projects/<projectIdentifier>/issues?...
-        # used to store the created Ids under the right identifier, and prevent accidents, assuming 
-        # you dont use same identifiers among different Redmine hosts...
         project_id: demandas
-        # Redmine Objects/Entities that are related to sheet's data.
         entities:
-          # Issue object
           Issue:
-            # previously relatd to Doctrien 1.X adapted to Redmine issue types.
-            # Not used schema_entity: ~ # si entities[entName] no coincide con el esquema setear este valor
-            # object deefault values (in this case Issue) can be [callbackClass, Callbackmethod]
-            # these default need not to be in the sheet, but might be mandatory for the API.
-            # you could also use defaults for cusotm fields here, just with the name.
             defaults:
               project: A Nuevos Medios, Seguimiento de Demandas
               status: Nueva
@@ -72,33 +199,19 @@ sheets:
               assigned_to: ~ 
               author: 'juan'
               due_date: ~
-              start_date: [Defaults\Defaults, startDate]
+              start_date: [Transform\Defaults\Defaults, startDate]
               tracker: Demanda
               "Fecha Comprometido": '2013-11-01'
               Beneficiario: N/N
               subject: 'Sin Asunto'
               Jurisdicción: '-----------------'
         
-        # These are the fields expected to be present in the CSV or any other sheet like input
-        # next definition matched a CSV as follows (showing two records): 
-        # [Subject;Description;Sprint] the rest of mandatory values are defined above for "Issue"
-        # subject1;Description1;8
-        # subject2;Description2;8
         fields:
-          # field name
           beneficiario:
-            # this key relates this field with Redmine's model described above
             model: {entity: 'Issue', column: 'Beneficiario'}
-            # This are the coordinates, where the parser tries to find the 1st occurrence of the field. 
-            # Zero based. from the upper-left corner
             coord: {x: 1, y: 0}
-            # default value for this field. ovverides other defaults possibly defined above. 
             default: ~ # Si !== ~ pisa al default del schema y al default en [entities]
-            # necesary moves to reach next instance of this field, e.i. next record. Normally it'll be just 
-            # one step down. (Y+1, X+0). But for values in headers, that appears only once, might be 
-            # (Y+0, X+0) so, the same value is used for every record.
             increment: {x: 0, y: 1}  
-            # callback that might be needed to transform input data before being persisted.
             transform: ~ # a callback method
             
           subject:
@@ -158,24 +271,14 @@ sheets:
             transform: ~ # a callback method
   #2nd sheet definition
   iprodich:  
-    # sheet Name, not used unless you add a web form that might use this name.
     name: iprodich
-    # each sheet could host several record types, here's each definition
+    persistence_engine: redmine
     records:
-      # recordName use as index to select this config in [Run customization]
       iprodich:
-        # record Label, not used.
         name: iprodich
         project_id: iprodich
-        # Redmine Objects/Entities that are related to sheet's data.
         entities:
-          # Issue object
           Issue:
-            # previously relatd to Doctrien 1.X adapted to Redmine issue types.
-            # Not used schema_entity: ~ # si entities[entName] no coincide con el esquema setear este valor
-            # object deefault values (in this case Issue) can be [callbackClass, Callbackmethod]
-            # these default need not to be in the sheet, but might be mandatory for the API.
-            # you could also use defaults for cusotm fields here, just with the name.
             defaults:
               project: Gestión I.Pro.Di.Ch
               status: Nueva
@@ -183,19 +286,13 @@ sheets:
               assigned_to: juanmf
               author: 'juan'
               due_date: ~
-              start_date: [Defaults\Defaults, startDate]
+              start_date: [Transform\Defaults\Defaults, startDate]
               tracker: Demanda
               "Fecha Comprometido": '2013-11-01'
               subject: 'Sin Asunto'
               sprint: 8
               
-        # These are the fields expected to be present in the CSV or any other sheet like input
-        # next definition matched a CSV as follows (showing two records): 
-        # [Subject;Description;Sprint] the rest of mandatory values are defined above for "Issue"
-        # subject1;Description1;8
-        # subject2;Description2;8
         fields:
-          # field name
           subject:
             model: {entity: 'Issue', column: 'subject'} # entity referencia entities[entity] no al schema. Para eso está entities[entity][schema_entity], en caso de que difiera.
             coord: {x: 0, y: 0}
@@ -205,49 +302,22 @@ sheets:
 
   #3rd sheet definition for updates
   updatedemandas:  
-    # sheet Name, not used unless you add a web form that might use this name.
     name: Las demandas que se exportaron por algo (enviar a evelyn) y se desea actualizar en batch
-    # each sheet could host several record types, here's each definition
+    persistence_engine: redmine
     records:
-      # recordName use as index to select this config in [Run customization]
       demanda:
-        # record Label, not used.
         name: Demanda
-        # Must be the project identifier. <RedmineDomain>/projects/<projectIdentifier>/issues?...
-        # used to store the created Ids under the right identifier, and prevent accidents, assuming 
-        # you dont use same identifiers among different Redmine hosts...
         project_id: demandas
-        # Redmine Objects/Entities that are related to sheet's data.
         entities:
-          # Issue object
           Issue:
-            # previously relatd to Doctrien 1.X adapted to Redmine issue types.
-            # Not used schema_entity: ~ # si entities[entName] no coincide con el esquema setear este valor
-            # object deefault values (in this case Issue) can be [callbackClass, Callbackmethod]
-            # these default need not to be in the sheet, but might be mandatory for the API.
-            # you could also use defaults for cusotm fields here, just with the name.
             defaults:
               project: A Nuevos Medios, Seguimiento de Demandas
               Derivado: 1
         
-        # These are the fields expected to be present in the CSV or any other sheet like input
-        # next definition matched a CSV as follows (showing two records): 
-        # [Subject;Description;Sprint] the rest of mandatory values are defined above for "Issue"
-        # subject1;Description1;8
-        # subject2;Description2;8
         fields:
-          # field name
           id:
-            # this key relates this field with Redmine's model described above
             model: {entity: 'Issue', column: 'id'}
-            # This are the coordinates, where the parser tries to find the 1st occurrence of the field. 
-            # Zero based. from the upper-left corner
             coord: {x: 0, y: 1}
-            # default value for this field. ovverides other defaults possibly defined above. 
             default: ~ # Si !== ~ pisa al default del schema y al default en [entities]
-            # necesary moves to reach next instance of this field, e.i. next record. Normally it'll be just 
-            # one step down. (Y+1, X+0). But for values in headers, that appears only once, might be 
-            # (Y+0, X+0) so, the same value is used for every record.
             increment: {x: 0, y: 1}  
-            # callback that might be needed to transform input data before being persisted.
             transform: ~ # a callback method          

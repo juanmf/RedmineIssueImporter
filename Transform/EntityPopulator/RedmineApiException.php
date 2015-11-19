@@ -1,6 +1,6 @@
 <?php
 
-namespace EntityPopulator;
+namespace Transform\EntityPopulator;
 
 /**
  * Uses an attribute called $return to hold Redmine API error messages.

@@ -1,6 +1,9 @@
 <?php
 
-namespace Parsers;
+namespace In\Parsers;
+
+use In\Parsers\RecordDefinition\RecordDefinition;
+use In\Parsers\RecordDefinition\VisitorRecord;
 
 /**
  * Handles parsing of CSV files, following the record structure imposed by 
@@ -12,29 +15,29 @@ namespace Parsers;
 class CsvSheetRecordParser extends SheetRecordParserAbstract
 {
     protected 
-        $_sheet,
-        $_fieldParser,
-        $_key;
+        $sheet,
+        $fieldParser,
+        $key;
 
     /**
      * Initializes this RecordParser.
      * 
-     * @param resource $sheetFile             The path to the Sheet file in File System
-     * @param array    $sheetRecordDefinition Record Definition from importSchema.yml 
+     * @param resource         $sheetFile             The path to the Sheet file in File System
+     * @param RecordDefinition $sheetRecordDefinition Record Definition from importSchema.yml 
      * config file
-     * @param string   $delimiter             The delimiter character used to 
+     * @param string           $delimiter             The delimiter character used to 
      * separate fields in Sheet.
      * 
      * @return void
      */
     public function __construct(
-        $sheetFile, array $sheetRecordDefinition, $delimiter
+        $sheetFile,  RecordDefinition $sheetRecordDefinition, $delimiter
     ) {
         parent::__construct($sheetFile, $sheetRecordDefinition, $delimiter);
         if (($handle = fopen($sheetFile, "r")) !== FALSE) {
             $index = 0;
             while (($data = fgetcsv($handle, 0, $delimiter)) !== FALSE) {
-                $this->_sheet[$index] = $data;
+                $this->sheet[$index] = $data;
                 $index++;
             }
         }
@@ -48,7 +51,7 @@ class CsvSheetRecordParser extends SheetRecordParserAbstract
      */
     public function current()
     {
-        return $this->_currentRecord;
+        return $this->currentRecord;
     }
 
     /**
@@ -58,7 +61,7 @@ class CsvSheetRecordParser extends SheetRecordParserAbstract
      */
     public function key()
     {
-        return $this->_key;
+        return $this->key;
     }
 
     /**
@@ -69,15 +72,15 @@ class CsvSheetRecordParser extends SheetRecordParserAbstract
      */
     public function next()
     {
-        foreach ($this->_currentRecord as $index => $field) {
-            $this->_currentRecord[$index]['x'] += $this->_currentRecord[$index]['x_inc'];
-            $this->_currentRecord[$index]['y'] += $this->_currentRecord[$index]['y_inc'];
-            $this->_currentRecord[$index]['value'] = $this->getElementAt(
-                $this->_currentRecord[$index]['x'], 
-                $this->_currentRecord[$index]['y']
-            );
+        foreach ($this->currentRecord as $field) {
+            /* @var $field \In\Parsers\RecordDefinition\VisitorField */
+            $field->getCoord()->incrementCoord();
+            $field->setCurrentValue($this->getElementAt(
+                $field->getCoord()->x,
+                $field->getCoord()->y
+            ));
         }
-        $this->_key++;
+        $this->key++;
     }
 
     /**
@@ -87,21 +90,18 @@ class CsvSheetRecordParser extends SheetRecordParserAbstract
      */
     public function rewind()
     {
-        $index = 0;
-        foreach ($this->_sheetRecordDefinition['fields'] as $fname => $field) {
-            $_currentRecord[$index]['value'] = $this->getElementAt(
-                $field['coord']['x'],
-                $field['coord']['y']
-            );
-            $_currentRecord[$index]['x'] = $field['coord']['x'];
-            $_currentRecord[$index]['y'] = $field['coord']['y'];
-            $_currentRecord[$index]['x_inc'] = $field['increment']['x'];
-            $_currentRecord[$index]['y_inc'] = $field['increment']['y'];
-            $_currentRecord[$index]['name'] = $fname;
-            $index++;
+        $currentRecord = new VisitorRecord($this->sheetRecordDefinition);
+        foreach ($currentRecord as $field) {
+            /* @var $field RecordDefinition\VisitorField */
+            $field->setCurrentValue(
+                    $this->getElementAt(
+                        $field->getCoord()->x,
+                        $field->getCoord()->y
+                    )
+                );
         }
-        $this->_currentRecord = $_currentRecord;
-        $this->_key = 0;
+        $this->currentRecord = $currentRecord;
+        $this->key = 0;
     }
 
     /**
@@ -112,14 +112,14 @@ class CsvSheetRecordParser extends SheetRecordParserAbstract
      */
     public function valid()
     {
-        $allNulls = false;
-        foreach ($this->_currentRecord as $index => $field) {
-            if (! empty($field['value'])) {
-                $allNulls = true;
+        $anyValueSet = false;
+        foreach ($this->currentRecord as $field) {
+            if (! empty($field->getCurrentValue())) {
+                $anyValueSet = true;
                 break;
             }
         }
-        return $allNulls;
+        return $anyValueSet;
     }
 
     /**
@@ -132,8 +132,8 @@ class CsvSheetRecordParser extends SheetRecordParserAbstract
      */
     protected function getElementAt($x, $y)
     {
-        return isset ($this->_sheet[$y]) && isset ($this->_sheet[$y][$x])
-            ? $this->_sheet[$y][$x]
+        return isset ($this->sheet[$y]) && isset ($this->sheet[$y][$x])
+            ? $this->sheet[$y][$x]
             : null;
     }
 }

@@ -1,6 +1,9 @@
 <?php
 
-namespace EntityPopulator\Helper;
+namespace Transform\EntityPopulator\Helper;
+
+use In\Parsers\SheetRecordParserAbstract;
+use Config\Config;
 
 /**
  * Description of PhpConfigsHelper
@@ -95,7 +98,10 @@ class EntityPersistenceHelper {
      * @return void
      */
     private static function notify($eventName, $parameters) {
-        
+        // TODO: define event to notify.
+        $dispatcher = Config::getContainer()->get('dispatcher');
+        /* @var $dispatcher \Symfony\Component\EventDispatcher\EventDispatcherInterface */
+        $event = new \Symfony\Component\EventDispatcher\Event();
+        $dispatcher->dispatch($eventName, $event);
     }
-
 }

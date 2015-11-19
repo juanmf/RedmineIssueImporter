@@ -1,0 +1,18 @@
+parameters:
+    # ...
+    mailer.transport: sendmail
+
+services:
+    redmine_factory:
+        class:     \Out\Factory\RedmineEntityFactory
+    doctrine2_factory:
+        class:     \Out\Factory\DoctrineEntityFactory
+    dispatcher:
+        class:     Symfony\Component\EventDispatcher\EventDispatcher
+    mailer:
+        class:     Mailer
+        arguments: ["%mailer.transport%"]
+    newsletter_manager:
+        class:     NewsletterManager
+        calls:
+            - [setMailer, ["@mailer"]]

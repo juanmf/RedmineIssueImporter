@@ -1,6 +1,6 @@
 <?php
 
-namespace Defaults;
+namespace Transform\Defaults;
 
 /**
  * Place holder for default values callbacks, similar to Transformers, only that
@@ -16,7 +16,7 @@ class Defaults
      * method gets invoked and Isse sart_date is set to now.
      * 
      * @return string Current date
-     * @see /Config/config.yml See the default value for field start_date: [Defaults\Defaults, startDate]
+     * @see /Config/config.yml See the default value for field start_date: [Transform\Defaults\Defaults, startDate]
      */
     public static function startDate()
     {

@@ -157,7 +157,7 @@ sheets:
               assigned_to_id: 92
               author: 'juan'
               due_date: ~
-              start_date: [Defaults\Defaults, startDate]
+              start_date: [Transform\Defaults\Defaults, startDate]
               tracker: Demanda
               "Fecha Comprometido": '2013-11-01'
               Beneficiario: N/N
@@ -267,7 +267,7 @@ sheets:
               assigned_to: juanmf
               author: 'juan'
               due_date: ~
-              start_date: [Defaults\Defaults, startDate]
+              start_date: [Transform\Defaults\Defaults, startDate]
               tracker: Demanda
               "Fecha Comprometido": '2013-11-01'
               subject: 'Sin Asunto'
@@ -390,7 +390,7 @@ sheets:
               assigned_to: 'juan'
               author: 'juan'
               due_date: ~
-              start_date: [Defaults\Defaults, startDate]
+              start_date: [Transform\Defaults\Defaults, startDate]
               tracker: Demanda
               "Fecha Comprometido": '2013-11-01'  #custom field
               Beneficiario: N/N  #custom field

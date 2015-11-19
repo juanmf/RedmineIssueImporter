@@ -1,6 +1,8 @@
 <?php
 
-namespace Parsers;
+namespace In\Parsers;
+
+use \In\Parsers\RecordDefinition\RecordDefinition;
 
 /**
  * Represents a common interface for <FileType>SheetRecordParser every descendant
@@ -19,17 +21,24 @@ namespace Parsers;
  */
 abstract class SheetRecordParserAbstract implements \Iterator
 {
-    protected
-        $_sheetFile,
-        $_delimiter,
-        $_sheetRecordDefinition,
-        $_currentRecord,
+    protected $_sheetFile;
+    protected $_delimiter;
+    
+    /**
+     * @var \In\Parsers\RecordDefinition\RecordDefinition
+     */
+    protected $sheetRecordDefinition;
+    
+    /**
+     * @var \In\Parsers\RecordDefinition\VisitorRecord
+     */
+    protected $currentRecord;
             
-        /**
-         * @var SheetIterator This delegate knows the methos it should call on 
-         * next() and rewind()
-         */
-        $_sheetIterator;
+    /**
+     * @var SheetIterator This delegate knows the methos it should call on 
+     * next() and rewind()
+     */
+    protected $_sheetIterator;
 
     protected $_handlesMultipleSheets = false;
         
@@ -65,11 +74,11 @@ abstract class SheetRecordParserAbstract implements \Iterator
      * @return void
      */
     public function __construct(
-        $sheetFile, array $sheetRecordDefinition, $delimiter = null
+        $sheetFile, RecordDefinition $sheetRecordDefinition, $delimiter = null
     ) {
         $this->_sheetFile = $sheetFile;
         $this->_delimiter = $delimiter;
-        $this->_sheetRecordDefinition = $sheetRecordDefinition;
+        $this->sheetRecordDefinition = $sheetRecordDefinition;
     }
 
     /**
@@ -89,7 +98,7 @@ abstract class SheetRecordParserAbstract implements \Iterator
      */
     public function getSheetRecordDefinition()
     {
-        return $this->_sheetRecordDefinition;
+        return $this->sheetRecordDefinition;
     }
     
     /**
@@ -183,19 +192,19 @@ abstract class SheetRecordParserAbstract implements \Iterator
      * Returns an object of the class responsible for parsing the file type
      * declared by the user.
      *
-     * @param array  $sheetFileSpecs The submitted File temp data.
-     * @param string $fileType       The file type we have to parse.
-     * @param array  $recordDef      Record Definition from importSchema.yml 
+     * @param array             $sheetFileSpecs The submitted File temp data.
+     * @param string            $fileType       The file type we have to parse.
+     * @param RecordDefinition  $recordDef      Record Definition from importSchema.yml 
      * config file
-     * @param string $delimiter      The delimiter character used to 
+     * @param string            $delimiter      The delimiter character used to 
      * separate fields in Sheet.
      * 
      * @return SheetRecordParserAbstract
      */
     final public static function getInstance(
-        array $sheetFileSpecs, $fileType, array $recordDef = null, $delimiter = '|'
+        array $sheetFileSpecs, $fileType, RecordDefinition $recordDef = null, $delimiter = '|'
     ) {
-        $parserClass = 'Parsers\\';
+        $parserClass = 'In\\Parsers\\';
         $parserClass .= $fileType . 'SheetRecordParser';
         $sheetPath = $sheetFileSpecs['tmp_name'];
         if (! class_exists($parserClass)) {
