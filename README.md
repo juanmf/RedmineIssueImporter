@@ -1,5 +1,8 @@
 RedmineIssueImporter
 ====================
+
+Please download and use release 1.0.0 currently master version is not tested/guaranteed 
+to work.
 Use the Command Line and a config yml File to import CVS Sheets as Issues in Redmine. *With Custom Fields support*. And easily mapping your CSV different/corrupt fields values to the values accepted by Redmine (lists, boolean, date, etc..) fields 
 
 
