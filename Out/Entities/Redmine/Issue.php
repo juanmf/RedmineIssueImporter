@@ -56,7 +56,6 @@ class Issue extends RedmineEntity
         }
         $importService = \ImportService::getInstance();
         $api = $importService->getClient()->api(self::API);
-        die(var_dump($api));
         /* @var $api \Redmine\Api\Issue */
         $return = $api->create($this->toArray());
         $this->checkErrors($return);

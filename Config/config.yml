@@ -159,7 +159,7 @@ sheets:
             coord: {x: 0, y: 0}
             default: ~ # Si !== ~ pisa al default del schema y al default en [entities]
             increment: {x: 0, y: 1}  # ~ = {x: 0, y: 0} if field is recurrent increment determines the relative loction of the next sibling. ~ means the field is no recurrent, only appears once in a sheet-
-            transform: [Transformers\Transformer, asunto] # a callback method
+            transform: [Transform\Transformers\Transformer, asunto] # a callback method
            
           description:
             model: {entity: 'Issue', column: 'description', glue: '| '} # entity referencia entities[entity] no al schema. Para eso está entities[entity][schema_entity], en caso de que difiera.
@@ -173,7 +173,7 @@ sheets:
             coord: {x: 2, y: 0}
             default: ~ # Si !== ~ pisa al default del schema y al default en [entities]
             increment: {x: 0, y: 1}  # ~ = {x: 0, y: 0} if field is recurrent increment determines the relative loction of the next sibling. ~ means the field is no recurrent, only appears once in a sheet-
-            transform: [Transformers\Transformer, estado] # a callback method
+            transform: [Transform\Transformers\Transformer, estado] # a callback method
           
           observaciones:
             model: { entity: 'Issue', column: 'description', glue: '| '} # entity referencia entities[entity] no al schema. Para eso está entities[entity][schema_entity], en caso de que difiera.
@@ -219,14 +219,14 @@ sheets:
             coord: {x: 3, y: 0}
             default: ~ # Si !== ~ pisa al default del schema y al default en [entities]
             increment: {x: 0, y: 1}  # ~ = {x: 0, y: 0} if field is recurrent increment determines the relative loction of the next sibling. ~ means the field is no recurrent, only appears once in a sheet-
-            transform: [Transformers\Transformer, asunto] # a callback method
+            transform: [Transform\Transformers\Transformer, asunto] # a callback method
           
           Jurisdicción:
             model: {entity: 'Issue', column: 'Jurisdicción'} # entity referencia entities[entity] no al schema. Para eso está entities[entity][schema_entity], en caso de que difiera.
             coord: {x: 2, y: 0}
             default: ~ # Si !== ~ pisa al default del schema y al default en [entities]
             increment: {x: 0, y: 1}  # ~ = {x: 0, y: 0} if field is recurrent increment determines the relative loction of the next sibling. ~ means the field is no recurrent, only appears once in a sheet-
-            transform: [Transformers\Transformer, intermediario] # a callback method
+            transform: [Transform\Transformers\Transformer, intermediario] # a callback method
            
           description:
             model: {entity: 'Issue', column: 'description', glue: '| '} # entity referencia entities[entity] no al schema. Para eso está entities[entity][schema_entity], en caso de que difiera.
@@ -240,14 +240,14 @@ sheets:
             coord: {x: 0, y: 0}
             default: ~ # Si !== ~ pisa al default del schema y al default en [entities]
             increment: {x: 0, y: 1}  # ~ = {x: 0, y: 0} if field is recurrent increment determines the relative loction of the next sibling. ~ means the field is no recurrent, only appears once in a sheet-
-            transform: [Transformers\Transformer, localidad] # a callback method
+            transform: [Transform\Transformers\Transformer, localidad] # a callback method
            
           estado:
             model: { entity: 'Issue', column: 'status'} # entity referencia entities[entity] no al schema. Para eso está entities[entity][schema_entity], en caso de que difiera.
             coord: {x: 4, y: 0}
             default: ~ # Si !== ~ pisa al default del schema y al default en [entities]
             increment: {x: 0, y: 1}  # ~ = {x: 0, y: 0} if field is recurrent increment determines the relative loction of the next sibling. ~ means the field is no recurrent, only appears once in a sheet-
-            transform: [Transformers\Transformer, estado] # a callback method
+            transform: [Transform\Transformers\Transformer, estado] # a callback method
           
           observaciones:
             model: { entity: 'Issue', column: 'description', glue: '| '} # entity referencia entities[entity] no al schema. Para eso está entities[entity][schema_entity], en caso de que difiera.
@@ -261,7 +261,7 @@ sheets:
             coord: {x: 6, y: 0}
             default: ~ # Si !== ~ pisa al default del schema y al default en [entities]
             increment: {x: 0, y: 1}  # ~ = {x: 0, y: 0} if field is recurrent increment determines the relative loction of the next sibling. ~ means the field is no recurrent, only appears once in a sheet-
-            transform: [Transformers\Transformer, fecha] # a callback method
+            transform: [Transform\Transformers\Transformer, fecha] # a callback method
            
           localidad_en_descripcion:
             model: { entity: 'Issue', column: 'description', glue: '| '} # entity referencia entities[entity] no al schema. Para eso está entities[entity][schema_entity], en caso de que difiera.
@@ -298,7 +298,7 @@ sheets:
             coord: {x: 0, y: 0}
             default: ~ # Si !== ~ pisa al default del schema y al default en [entities]
             increment: {x: 0, y: 1}  # ~ = {x: 0, y: 0} if field is recurrent increment determines the relative loction of the next sibling. ~ means the field is no recurrent, only appears once in a sheet-
-            transform: [Transformers\Transformer, asunto] # a callback method
+            transform: [Transform\Transformers\Transformer, asunto] # a callback method
 
   #3rd sheet definition for updates
   updatedemandas:  

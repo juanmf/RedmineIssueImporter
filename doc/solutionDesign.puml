@@ -1,0 +1,98 @@
+@startuml
+package in {
+    class CsvSheetRecordParser
+    class SheetRecordParserAbstract
+    class FieldDefinition
+    class VisitorRecord
+    class EntityDefinition
+    class VisitorField
+    class EntityDefaultDefinition
+    class ModelColumn
+    class RecordDefinition
+    class Coord
+}
+
+package transform {
+    package transformers {
+        class StaticMappings
+        class Transformer
+    }
+    package entityPopulator {
+        class EntityPopulator
+
+        package helper {
+            class EntityRelationsHelper
+            class ValidationHelper
+            class EntityPersistenceHelper
+            class EntityFactoryHelper
+            class RecordSanitizerHelper
+        }
+    }
+    package defaults {
+        class Defaults
+    }
+}
+
+package out {
+    package factory {
+        class DoctrineEntityFactory
+        class EntityFactory
+        class RedmineEntityFactory
+    }
+    package Entity {
+        class Entity
+        class Issue
+        class RedmineEntity
+        class PopoWrapper
+    }
+}
+
+SheetRecordParserAbstract <|- CsvSheetRecordParser
+RecordDefinition *-- "n" FieldDefinition
+RecordDefinition *-- "n" EntityDefinition
+EntityDefinition *-- "n" EntityDefaultDefinition
+FieldDefinition  *-- "1" ModelColumn : model
+FieldDefinition  *-- "1" Coord : x,y;incX,incY
+FieldDefinition  ..> Transformer
+FieldDefinition  ..> Defaults
+
+VisitorRecord *-- "1" RecordDefinition 
+VisitorRecord *-- "n" VisitorField
+VisitorField *-- "1" FieldDefinition
+
+
+SheetRecordParserAbstract ..> RecordDefinition
+CsvSheetRecordParser ..> VisitorRecord
+
+EntityPopulator ..> SheetRecordParserAbstract
+EntityPopulator ..> EntityFactoryHelper : getRecordEntitiesInstances(VisitorRecord)
+EntityPopulator ..> RecordSanitizerHelper : lookUpForRecordFieldsDefault & \n applyRecordFieldsTransformation
+
+EntityPopulator ..> EntityPersistenceHelper : saveEntities(entity[])
+
+Entity <|-down- RedmineEntity
+RedmineEntity <|- Issue
+
+Transformer --> StaticMappings
+
+Entity <|- PopoWrapper
+
+EntityFactory <|-down- RedmineEntityFactory
+EntityFactory <|- DoctrineEntityFactory
+
+RedmineEntityFactory .> RedmineEntity
+DoctrineEntityFactory .> PopoWrapper
+
+EntityFactoryHelper .> EntityFactory : createEntities(VisitorRecord)
+
+EntityFactory .up.> VisitorRecord
+ImportService --> EntityPopulator : populateEntities()
+
+EntityPersistenceHelper ..> Entity : save()
+
+note left of EntityPopulator 
+  interacts with Helpers 
+  once per SheetRecord
+end note
+
+@enduml
