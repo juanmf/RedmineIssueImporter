@@ -165,19 +165,10 @@ class VisitorRecord implements \Iterator {
      * 
      * @return array suitable for ActiveRecord::fromArray() data assignment. 
      */
-    public static function processFieldsDataForEntityColumns(array $entFields) 
-    {
+    public static function processFieldsDataForEntityColumns(array $entFields) {
         $entityData = array();
         foreach ($entFields as $visitorField) {
-            try {
-                /* @var $visitorField VisitorField */
-                self::createColumn($visitorField, $entityData);
-                
-            } catch (\Exception $exc) {
-                echo $exc->getTraceAsString();
-                var_dump($visitorField);
-            }
-
+            self::createColumn($visitorField, $entityData);
         }
         return $entityData;
     }
